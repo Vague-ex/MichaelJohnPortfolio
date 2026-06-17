@@ -47,6 +47,10 @@ migration, because a page's content is stored as JSON.
 2. Paste the entire contents of [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql) and click **Run**.
    This creates the tables, security rules, the image storage bucket, and seed pages.
    (It is safe to run again later.)
+3. Then run [`supabase/migrations/0002_seed_content.sql`](supabase/migrations/0002_seed_content.sql)
+   the same way. This fills the Work / About / Contact pages with Michael's real
+   details from his resume. **Run this only once** — after he edits pages in
+   `/admin`, re-running it would overwrite his changes.
 
 ### 3. Lock down auth and create the admin account
 1. **Authentication → Providers → Email**: keep it enabled.

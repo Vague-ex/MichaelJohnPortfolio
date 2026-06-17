@@ -5,8 +5,8 @@ export default function SiteFooter({ settings }: { settings: SiteSettings }) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-16 border-t border-neutral-200">
-      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 text-sm text-neutral-500 sm:flex-row">
+    <footer className="mt-16 border-t border-line">
+      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 text-sm text-muted sm:flex-row">
         <p>
           © {year} {settings.site_title}
         </p>
@@ -16,7 +16,7 @@ export default function SiteFooter({ settings }: { settings: SiteSettings }) {
               href={instagram}
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-neutral-900"
+              className="transition hover:text-accent"
             >
               Instagram
             </a>
@@ -26,7 +26,7 @@ export default function SiteFooter({ settings }: { settings: SiteSettings }) {
               href={facebook}
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-neutral-900"
+              className="transition hover:text-accent"
             >
               Facebook
             </a>

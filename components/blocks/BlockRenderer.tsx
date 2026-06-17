@@ -79,33 +79,45 @@ function Paragraphs({ text }: { text: string }) {
 
 function Hero({ block }: { block: HeroBlock }) {
   const align = block.align ?? "center";
+  const hasImage = !!block.image?.url;
   return (
-    <section className="relative isolate overflow-hidden">
-      {block.image?.url && (
+    <section
+      className={`relative isolate overflow-hidden ${
+        hasImage
+          ? ""
+          : "bg-gradient-to-br from-accent/15 via-background to-accent/5"
+      }`}
+    >
+      {hasImage && (
         <>
           <Image
-            src={block.image.url}
-            alt={block.image.alt ?? ""}
+            src={block.image!.url}
+            alt={block.image!.alt ?? ""}
             fill
             priority
             sizes="100vw"
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute inset-0 bg-black/45" />
         </>
       )}
       <div
-        className={`relative mx-auto flex max-w-5xl flex-col gap-3 px-6 ${
-          block.image?.url
-            ? "min-h-[60vh] justify-end pb-16 text-white"
-            : "py-20"
+        className={`relative mx-auto flex max-w-5xl flex-col gap-4 px-6 ${
+          hasImage ? "min-h-[60vh] justify-end pb-16 text-white" : "py-24"
         } ${alignClass[align]} ${align === "center" ? "items-center" : ""}`}
       >
         <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
           {block.heading}
         </h1>
+        <span className="h-1 w-16 rounded-full bg-accent" />
         {block.subheading && (
-          <p className="max-w-2xl text-lg opacity-90">{block.subheading}</p>
+          <p
+            className={`max-w-2xl text-lg ${
+              hasImage ? "opacity-90" : "text-muted"
+            }`}
+          >
+            {block.subheading}
+          </p>
         )}
       </div>
     </section>
@@ -118,7 +130,9 @@ function RichText({ block }: { block: RichTextBlock }) {
     <section className="mx-auto max-w-3xl px-6 py-10">
       <div className={`space-y-4 ${alignClass[align]}`}>
         {block.heading && (
-          <h2 className="text-2xl font-semibold">{block.heading}</h2>
+          <h2 className="inline-block border-b-2 border-accent pb-1 text-2xl font-semibold">
+            {block.heading}
+          </h2>
         )}
         {block.text && <Paragraphs text={block.text} />}
       </div>
@@ -136,7 +150,7 @@ function SingleImage({ block }: { block: ImageBlock }) {
         className="h-auto w-full rounded-lg"
       />
       {block.image.caption && (
-        <figcaption className="mt-2 text-center text-sm text-neutral-500">
+        <figcaption className="mt-2 text-center text-sm text-muted">
           {block.image.caption}
         </figcaption>
       )}
@@ -151,12 +165,14 @@ function Gallery({ block }: { block: GalleryBlock }) {
   return (
     <section className="mx-auto max-w-6xl px-6 py-10">
       {block.heading && (
-        <h2 className="mb-6 text-2xl font-semibold">{block.heading}</h2>
+        <h2 className="mb-6 inline-block border-b-2 border-accent pb-1 text-2xl font-semibold">
+          {block.heading}
+        </h2>
       )}
       <div className={`grid grid-cols-1 gap-4 ${cols}`}>
         {images.map((img, i) => (
           <figure key={i} className="group">
-            <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-neutral-100">
+            <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-card shadow-sm transition duration-300 group-hover:shadow-md">
               <Image
                 src={img.url}
                 alt={img.alt ?? ""}
@@ -166,7 +182,7 @@ function Gallery({ block }: { block: GalleryBlock }) {
               />
             </div>
             {img.caption && (
-              <figcaption className="mt-2 text-sm text-neutral-500">
+              <figcaption className="mt-2 text-sm text-muted">
                 {img.caption}
               </figcaption>
             )}
@@ -218,9 +234,7 @@ function VideoEmbed({ block }: { block: VideoEmbedBlock }) {
         />
       </div>
       {block.caption && (
-        <p className="mt-2 text-center text-sm text-neutral-500">
-          {block.caption}
-        </p>
+        <p className="mt-2 text-center text-sm text-muted">{block.caption}</p>
       )}
     </section>
   );
@@ -243,7 +257,7 @@ function renderBlock(block: Block) {
     case "divider":
       return (
         <div key={block.id} className="mx-auto max-w-5xl px-6">
-          <hr className="border-neutral-200" />
+          <hr className="border-line" />
         </div>
       );
   }
