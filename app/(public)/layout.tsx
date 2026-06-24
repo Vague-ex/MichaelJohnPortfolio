@@ -14,7 +14,11 @@ export default async function PublicLayout({
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <SiteHeader siteTitle={settings.site_title} items={navItems} />
+      <SiteHeader
+        siteTitle={settings.site_title}
+        items={navItems}
+        contactEmail={settings.socials?.email}
+      />
       <div className="flex-1">{children}</div>
       <SiteFooter settings={settings} navItems={navItems} />
     </div>

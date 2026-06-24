@@ -77,6 +77,20 @@ export interface DividerBlock {
   type: "divider";
 }
 
+export interface Album {
+  id: string;
+  title: string;
+  cover?: ImageRef;
+  images: ImageRef[]; // each image's `caption` is its title in the viewer
+}
+
+export interface ImageAlbumBlock {
+  id: string;
+  type: "image_album";
+  heading?: string;
+  albums: Album[];
+}
+
 export interface ProfileDetail {
   label: string;
   value: string;
@@ -102,6 +116,7 @@ export type Block =
   | ColumnsBlock
   | VideoEmbedBlock
   | ProfileBlock
+  | ImageAlbumBlock
   | DividerBlock;
 
 export type BlockType = Block["type"];

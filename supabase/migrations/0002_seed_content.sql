@@ -29,7 +29,8 @@ values
    '[
      {"id":"home-hero","type":"hero","eyebrow":"Hi, I am","heading":"Michael John Aguilar","subheading":"Digital Media Artist & Graphic Designer based in Negros Occidental.","align":"center","ctaText":"Get in touch","ctaUrl":"/contact"},
      {"id":"home-intro","type":"rich_text","align":"center","text":"Fine Arts graduate majoring in Digital Media Arts — creating logos, shirt graphics, digital illustrations, and murals for brands and creators."},
-     {"id":"home-work","type":"gallery","heading":"Selected Work","columns":3,"images":[]}
+     {"id":"home-work","type":"gallery","heading":"Selected Work","columns":3,"images":[]},
+     {"id":"home-albums","type":"image_album","heading":"Collections","albums":[{"id":"album-tshirt","title":"T-Shirt Designs","images":[]},{"id":"album-canvas","title":"Canvas Paintings","images":[]}]}
    ]'::jsonb),
 
   ('about', 'About', 1, true, true,

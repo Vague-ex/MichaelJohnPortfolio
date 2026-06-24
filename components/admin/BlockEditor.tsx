@@ -1,8 +1,9 @@
 "use client";
 
 import ImageInput from "@/components/admin/ImageInput";
-import { getEmbedUrl } from "@/lib/blocks";
+import { getEmbedUrl, newId } from "@/lib/blocks";
 import type {
+  Album,
   Block,
   ColumnItem,
   ImageRef,
@@ -319,6 +320,170 @@ export default function BlockEditor({
             className="rounded-md border border-dashed border-neutral-400 px-3 py-1.5 text-sm hover:bg-neutral-100"
           >
             + Add column
+          </button>
+        </div>
+      );
+    }
+
+    case "image_album": {
+      const updateAlbum = (ai: number, patch: Partial<Album>) => {
+        const albums = block.albums.map((a, idx) =>
+          idx === ai ? { ...a, ...patch } : a,
+        );
+        onChange({ ...block, albums });
+      };
+      const moveAlbum = (ai: number, dir: -1 | 1) => {
+        const j = ai + dir;
+        if (j < 0 || j >= block.albums.length) return;
+        const albums = [...block.albums];
+        [albums[ai], albums[j]] = [albums[j], albums[ai]];
+        onChange({ ...block, albums });
+      };
+      const removeAlbum = (ai: number) =>
+        onChange({
+          ...block,
+          albums: block.albums.filter((_, idx) => idx !== ai),
+        });
+
+      const updateImage = (
+        ai: number,
+        ii: number,
+        img: ImageRef | undefined,
+      ) => {
+        const images = [...block.albums[ai].images];
+        if (img) images[ii] = img;
+        else images.splice(ii, 1);
+        updateAlbum(ai, { images });
+      };
+      const moveImage = (ai: number, ii: number, dir: -1 | 1) => {
+        const images = [...block.albums[ai].images];
+        const j = ii + dir;
+        if (j < 0 || j >= images.length) return;
+        [images[ii], images[j]] = [images[j], images[ii]];
+        updateAlbum(ai, { images });
+      };
+
+      return (
+        <div className="space-y-4">
+          <Field label="Section heading (optional)">
+            <input
+              className={inputClass}
+              value={block.heading ?? ""}
+              onChange={(e) => onChange({ ...block, heading: e.target.value })}
+            />
+          </Field>
+
+          {block.albums.map((album, ai) => (
+            <div
+              key={album.id}
+              className="space-y-3 rounded-lg border border-neutral-200 bg-neutral-50 p-3"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold">Album {ai + 1}</span>
+                <div className="flex gap-1">
+                  <button
+                    type="button"
+                    onClick={() => moveAlbum(ai, -1)}
+                    className="rounded border border-neutral-300 px-1.5 text-xs"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveAlbum(ai, 1)}
+                    className="rounded border border-neutral-300 px-1.5 text-xs"
+                  >
+                    ↓
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeAlbum(ai)}
+                    className="rounded border border-neutral-300 px-2 text-xs text-red-600 hover:bg-red-50"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+
+              <Field label="Album title">
+                <input
+                  className={inputClass}
+                  value={album.title}
+                  onChange={(e) => updateAlbum(ai, { title: e.target.value })}
+                />
+              </Field>
+
+              <Field label="Cover image (optional — defaults to first image)">
+                <ImageInput
+                  value={album.cover}
+                  onChange={(cover) => updateAlbum(ai, { cover })}
+                />
+              </Field>
+
+              <div className="space-y-2">
+                <span className="text-xs font-medium text-neutral-600">
+                  Images (the caption is shown as each image&apos;s title)
+                </span>
+                {album.images.map((img, ii) => (
+                  <div
+                    key={ii}
+                    className="rounded-md border border-neutral-200 bg-white p-2"
+                  >
+                    <div className="mb-1 flex items-center justify-between">
+                      <span className="text-xs text-neutral-500">
+                        Image {ii + 1}
+                      </span>
+                      <div className="flex gap-1">
+                        <button
+                          type="button"
+                          onClick={() => moveImage(ai, ii, -1)}
+                          className="rounded border border-neutral-300 px-1.5 text-xs"
+                        >
+                          ↑
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveImage(ai, ii, 1)}
+                          className="rounded border border-neutral-300 px-1.5 text-xs"
+                        >
+                          ↓
+                        </button>
+                      </div>
+                    </div>
+                    <ImageInput
+                      value={img}
+                      showCaption
+                      onChange={(next) => updateImage(ai, ii, next)}
+                    />
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() =>
+                    updateAlbum(ai, { images: [...album.images, { url: "" }] })
+                  }
+                  className="rounded-md border border-dashed border-neutral-400 px-3 py-1.5 text-sm hover:bg-neutral-100"
+                >
+                  + Add image
+                </button>
+              </div>
+            </div>
+          ))}
+
+          <button
+            type="button"
+            onClick={() =>
+              onChange({
+                ...block,
+                albums: [
+                  ...block.albums,
+                  { id: newId(), title: "New album", images: [] },
+                ],
+              })
+            }
+            className="rounded-md border border-dashed border-neutral-400 px-3 py-1.5 text-sm hover:bg-neutral-100"
+          >
+            + Add album
           </button>
         </div>
       );

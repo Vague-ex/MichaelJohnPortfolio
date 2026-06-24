@@ -13,11 +13,17 @@ export default function SiteFooter({
   const { facebook, instagram, email } = settings.socials ?? {};
   const year = new Date().getFullYear();
 
-  const socials: { url?: string; name: SocialName; label: string }[] = [
-    { url: instagram, name: "instagram", label: "Instagram" },
-    { url: facebook, name: "facebook", label: "Facebook" },
-    { url: email ? `mailto:${email}` : undefined, name: "email", label: "Email" },
-  ].filter((s) => s.url);
+  const socials = (
+    [
+      { url: instagram, name: "instagram", label: "Instagram" },
+      { url: facebook, name: "facebook", label: "Facebook" },
+      {
+        url: email ? `mailto:${email}` : undefined,
+        name: "email",
+        label: "Email",
+      },
+    ] satisfies { url?: string; name: SocialName; label: string }[]
+  ).filter((s) => s.url);
 
   return (
     <footer className="mt-20 border-t border-line bg-surface">

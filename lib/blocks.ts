@@ -21,6 +21,10 @@ export const BLOCK_META: Record<
     label: "Columns",
     description: "Side-by-side columns of text and images",
   },
+  image_album: {
+    label: "Image album",
+    description: "Clickable albums (collections) that open to browse images",
+  },
   profile: {
     label: "Biography / profile",
     description: "Photo, bio, personal details, and social links",
@@ -38,6 +42,7 @@ export const BLOCK_ORDER: BlockType[] = [
   "rich_text",
   "image",
   "gallery",
+  "image_album",
   "columns",
   "video_embed",
   "divider",
@@ -57,6 +62,13 @@ export function createBlock(type: BlockType): Block {
       return { id, type, heading: "", columns: 3, images: [] };
     case "columns":
       return { id, type, columns: [{ text: "" }, { text: "" }] };
+    case "image_album":
+      return {
+        id,
+        type,
+        heading: "Collections",
+        albums: [{ id: newId(), title: "New album", images: [] }],
+      };
     case "profile":
       return {
         id,

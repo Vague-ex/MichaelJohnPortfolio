@@ -15,6 +15,7 @@ import type {
 import { getEmbedUrl } from "@/lib/blocks";
 import Reveal from "@/components/public/Reveal";
 import SocialIcon, { type SocialName } from "@/components/public/SocialIcon";
+import ImageAlbum from "@/components/blocks/ImageAlbum";
 
 const alignClass: Record<TextAlign, string> = {
   left: "text-left",
@@ -327,15 +328,17 @@ function Profile({
   settings?: SiteSettings;
 }) {
   const socials = settings?.socials ?? {};
-  const socialLinks: { url?: string; name: SocialName; label: string }[] = [
-    { url: socials.instagram, name: "instagram", label: "Instagram" },
-    { url: socials.facebook, name: "facebook", label: "Facebook" },
-    {
-      url: socials.email ? `mailto:${socials.email}` : undefined,
-      name: "email",
-      label: "Email",
-    },
-  ].filter((s) => s.url);
+  const socialLinks = (
+    [
+      { url: socials.instagram, name: "instagram", label: "Instagram" },
+      { url: socials.facebook, name: "facebook", label: "Facebook" },
+      {
+        url: socials.email ? `mailto:${socials.email}` : undefined,
+        name: "email",
+        label: "Email",
+      },
+    ] satisfies { url?: string; name: SocialName; label: string }[]
+  ).filter((s) => s.url);
 
   const details = block.details?.filter((d) => d.value.trim().length > 0) ?? [];
 
@@ -448,6 +451,8 @@ function renderBlock(block: Block, settings?: SiteSettings) {
       return <Gallery block={block} />;
     case "columns":
       return <Columns block={block} />;
+    case "image_album":
+      return <ImageAlbum block={block} />;
     case "profile":
       return <Profile block={block} settings={settings} />;
     case "video_embed":

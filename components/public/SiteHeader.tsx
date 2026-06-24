@@ -12,14 +12,29 @@ export interface NavItem {
 export default function SiteHeader({
   siteTitle,
   items,
+  contactEmail,
 }: {
   siteTitle: string;
   items: NavItem[];
+  contactEmail?: string;
 }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
   const hasContact = items.some((i) => i.href === "/contact");
+
+  // "Hire me" opens a pre-filled Gmail compose window when an email is set,
+  // otherwise falls back to the contact page.
+  const gmailHref = contactEmail
+    ? `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
+        contactEmail,
+      )}&su=${encodeURIComponent(
+        `Project inquiry for ${siteTitle}`,
+      )}&body=${encodeURIComponent(
+        `Hi ${siteTitle},\n\nI came across your portfolio and I'd love to work with you on a project.\n\nHere are a few details:\n- What I need: \n- Timeline: \n- Budget: \n\nThanks!`,
+      )}`
+    : null;
+  const hireHref = gmailHref ?? (hasContact ? "/contact" : null);
 
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-background/85 backdrop-blur">
@@ -48,13 +63,16 @@ export default function SiteHeader({
             ))}
           </nav>
 
-          {hasContact && (
-            <Link
-              href="/contact"
+          {hireHref && (
+            <a
+              href={hireHref}
+              {...(gmailHref
+                ? { target: "_blank", rel: "noopener noreferrer" }
+                : {})}
               className="hidden rounded-full bg-accent px-5 py-2 text-sm font-medium text-white transition hover:bg-accent-dark sm:inline-block"
             >
               Hire me
-            </Link>
+            </a>
           )}
 
           <button
