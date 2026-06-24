@@ -20,10 +20,15 @@ export type TextAlign = "left" | "center" | "right";
 export interface HeroBlock {
   id: string;
   type: "hero";
+  eyebrow?: string;
   heading: string;
   subheading?: string;
   image?: ImageRef;
   align?: TextAlign;
+  ctaText?: string;
+  ctaUrl?: string;
+  cta2Text?: string;
+  cta2Url?: string;
 }
 
 export interface RichTextBlock {
@@ -72,6 +77,23 @@ export interface DividerBlock {
   type: "divider";
 }
 
+export interface ProfileDetail {
+  label: string;
+  value: string;
+}
+
+export interface ProfileBlock {
+  id: string;
+  type: "profile";
+  image?: ImageRef;
+  eyebrow?: string;
+  heading: string;
+  body?: string;
+  details: ProfileDetail[];
+  ctaText?: string;
+  ctaUrl?: string;
+}
+
 export type Block =
   | HeroBlock
   | RichTextBlock
@@ -79,6 +101,7 @@ export type Block =
   | GalleryBlock
   | ColumnsBlock
   | VideoEmbedBlock
+  | ProfileBlock
   | DividerBlock;
 
 export type BlockType = Block["type"];

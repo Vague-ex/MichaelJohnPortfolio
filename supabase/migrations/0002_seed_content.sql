@@ -27,14 +27,14 @@ insert into public.pages (slug, title, nav_order, published, show_in_nav, conten
 values
   ('home', 'Work', 0, true, true,
    '[
-     {"id":"home-hero","type":"hero","heading":"Michael John Aguilar","subheading":"Digital Media Artist & Graphic Designer","align":"center"},
+     {"id":"home-hero","type":"hero","eyebrow":"Hi, I am","heading":"Michael John Aguilar","subheading":"Digital Media Artist & Graphic Designer based in Negros Occidental.","align":"center","ctaText":"Get in touch","ctaUrl":"/contact"},
      {"id":"home-intro","type":"rich_text","align":"center","text":"Fine Arts graduate majoring in Digital Media Arts — creating logos, shirt graphics, digital illustrations, and murals for brands and creators."},
      {"id":"home-work","type":"gallery","heading":"Selected Work","columns":3,"images":[]}
    ]'::jsonb),
 
   ('about', 'About', 1, true, true,
    '[
-     {"id":"about-head","type":"rich_text","heading":"About","text":"Creative and detail-oriented Fine Arts graduate majoring in Digital Media Arts, with experience in graphic design, digital illustration, and multimedia content creation. Skilled in creating engaging visual designs for digital and print platforms.\n\nMotivated professional with five years of experience in data encoding, merchant record management, and creative design — eager to contribute technical accuracy and creative expertise to organizations that value innovation, efficiency, and quality."},
+     {"id":"about-bio","type":"profile","eyebrow":"My Biography","heading":"Digital Media Artist & Graphic Designer","body":"Creative and detail-oriented Fine Arts graduate majoring in Digital Media Arts, with experience in graphic design, digital illustration, and multimedia content creation. Skilled in creating engaging visual designs for digital and print platforms.","details":[{"label":"Name","value":"Michael John Aguilar"},{"label":"Email","value":"michaeljohnaguilar.work@gmail.com"},{"label":"Phone","value":"0945 386 9496"},{"label":"Location","value":"E.B. Magalona, Negros Occidental"}],"ctaText":"","ctaUrl":""},
      {"id":"about-div1","type":"divider"},
      {"id":"about-skills","type":"columns","columns":[
         {"heading":"Creative","text":"Graphic Design & Digital Illustration\nMural & Visual Arts\nMultimedia Content Creation\nLogo & Shirt Design"},

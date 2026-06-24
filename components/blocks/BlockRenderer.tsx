@@ -6,11 +6,15 @@ import type {
   HeroBlock,
   ImageBlock,
   ImageRef,
+  ProfileBlock,
   RichTextBlock,
+  SiteSettings,
   TextAlign,
   VideoEmbedBlock,
 } from "@/lib/types";
 import { getEmbedUrl } from "@/lib/blocks";
+import Reveal from "@/components/public/Reveal";
+import SocialIcon, { type SocialName } from "@/components/public/SocialIcon";
 
 const alignClass: Record<TextAlign, string> = {
   left: "text-left",
@@ -27,7 +31,10 @@ const gridColsClass: Record<number, string> = {
   6: "sm:grid-cols-3 lg:grid-cols-6",
 };
 
-/** A single image that respects its natural aspect ratio when known. */
+// ---------------------------------------------------------------------------
+// Small shared pieces
+// ---------------------------------------------------------------------------
+
 function SmartImage({
   image,
   sizes,
@@ -50,7 +57,6 @@ function SmartImage({
       />
     );
   }
-  // Unknown dimensions: fill a 4:3 box.
   return (
     <div className="relative aspect-[4/3] w-full overflow-hidden">
       <Image
@@ -77,48 +83,145 @@ function Paragraphs({ text }: { text: string }) {
   );
 }
 
+function SectionHeading({
+  title,
+  align = "left",
+}: {
+  title: string;
+  align?: TextAlign;
+}) {
+  return (
+    <div className={`mb-8 ${alignClass[align]}`}>
+      <h2 className="text-2xl font-semibold sm:text-3xl">{title}</h2>
+      <span
+        className={`mt-3 block h-1 w-12 rounded-full bg-accent ${
+          align === "center" ? "mx-auto" : ""
+        }`}
+      />
+    </div>
+  );
+}
+
+function Eyebrow({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">
+      {children}
+    </p>
+  );
+}
+
+function CtaButtons({
+  primary,
+  primaryUrl,
+  secondary,
+  secondaryUrl,
+  align = "left",
+}: {
+  primary?: string;
+  primaryUrl?: string;
+  secondary?: string;
+  secondaryUrl?: string;
+  align?: TextAlign;
+}) {
+  const hasPrimary = primary && primaryUrl;
+  const hasSecondary = secondary && secondaryUrl;
+  if (!hasPrimary && !hasSecondary) return null;
+  return (
+    <div
+      className={`flex flex-wrap gap-3 pt-2 ${
+        align === "center" ? "justify-center" : ""
+      }`}
+    >
+      {hasPrimary && (
+        <a
+          href={primaryUrl}
+          className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-white transition hover:bg-accent-dark"
+        >
+          {primary}
+        </a>
+      )}
+      {hasSecondary && (
+        <a
+          href={secondaryUrl}
+          className="rounded-full border border-foreground/20 px-6 py-3 text-sm font-medium transition hover:border-foreground"
+        >
+          {secondary}
+        </a>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Blocks
+// ---------------------------------------------------------------------------
+
 function Hero({ block }: { block: HeroBlock }) {
   const align = block.align ?? "center";
   const hasImage = !!block.image?.url;
+
+  if (hasImage) {
+    return (
+      <section className="relative overflow-hidden bg-gradient-to-br from-accent-soft via-background to-background">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-16 sm:py-20 md:grid-cols-2">
+          <div className="space-y-5">
+            {block.eyebrow && <Eyebrow>{block.eyebrow}</Eyebrow>}
+            <h1 className="text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
+              {block.heading}
+            </h1>
+            <span className="block h-1 w-16 rounded-full bg-accent" />
+            {block.subheading && (
+              <p className="max-w-md text-lg text-muted">{block.subheading}</p>
+            )}
+            <CtaButtons
+              primary={block.ctaText}
+              primaryUrl={block.ctaUrl}
+              secondary={block.cta2Text}
+              secondaryUrl={block.cta2Url}
+            />
+          </div>
+          <div className="relative mx-auto w-full max-w-sm">
+            <div className="absolute -right-4 -top-4 h-full w-full rounded-[2rem] bg-accent/15" />
+            <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] shadow-sm">
+              <Image
+                src={block.image!.url}
+                alt={block.image!.alt ?? block.heading}
+                fill
+                priority
+                sizes="(max-width: 768px) 90vw, 420px"
+                className="object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section
-      className={`relative isolate overflow-hidden ${
-        hasImage
-          ? ""
-          : "bg-gradient-to-br from-accent/15 via-background to-accent/5"
-      }`}
-    >
-      {hasImage && (
-        <>
-          <Image
-            src={block.image!.url}
-            alt={block.image!.alt ?? ""}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-black/45" />
-        </>
-      )}
+    <section className="relative isolate overflow-hidden bg-gradient-to-br from-accent-soft via-background to-background">
+      <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
+      <div className="pointer-events-none absolute -left-20 bottom-0 h-56 w-56 rounded-full bg-accent/10 blur-3xl" />
       <div
-        className={`relative mx-auto flex max-w-5xl flex-col gap-4 px-6 ${
-          hasImage ? "min-h-[60vh] justify-end pb-16 text-white" : "py-24"
-        } ${alignClass[align]} ${align === "center" ? "items-center" : ""}`}
+        className={`relative mx-auto flex max-w-3xl flex-col gap-5 px-6 py-28 ${
+          alignClass[align]
+        } ${align === "center" ? "items-center" : ""}`}
       >
-        <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+        {block.eyebrow && <Eyebrow>{block.eyebrow}</Eyebrow>}
+        <h1 className="text-5xl font-semibold leading-tight sm:text-6xl">
           {block.heading}
         </h1>
-        <span className="h-1 w-16 rounded-full bg-accent" />
+        <span className="block h-1 w-16 rounded-full bg-accent" />
         {block.subheading && (
-          <p
-            className={`max-w-2xl text-lg ${
-              hasImage ? "opacity-90" : "text-muted"
-            }`}
-          >
-            {block.subheading}
-          </p>
+          <p className="max-w-2xl text-lg text-muted">{block.subheading}</p>
         )}
+        <CtaButtons
+          primary={block.ctaText}
+          primaryUrl={block.ctaUrl}
+          secondary={block.cta2Text}
+          secondaryUrl={block.cta2Url}
+          align={align}
+        />
       </div>
     </section>
   );
@@ -127,13 +230,9 @@ function Hero({ block }: { block: HeroBlock }) {
 function RichText({ block }: { block: RichTextBlock }) {
   const align = block.align ?? "left";
   return (
-    <section className="mx-auto max-w-3xl px-6 py-10">
+    <section className="mx-auto max-w-4xl px-6 py-12 sm:py-16">
       <div className={`space-y-4 ${alignClass[align]}`}>
-        {block.heading && (
-          <h2 className="inline-block border-b-2 border-accent pb-1 text-2xl font-semibold">
-            {block.heading}
-          </h2>
-        )}
+        {block.heading && <SectionHeading title={block.heading} align={align} />}
         {block.text && <Paragraphs text={block.text} />}
       </div>
     </section>
@@ -143,14 +242,14 @@ function RichText({ block }: { block: RichTextBlock }) {
 function SingleImage({ block }: { block: ImageBlock }) {
   if (!block.image.url) return null;
   return (
-    <figure className="mx-auto max-w-4xl px-6 py-6">
+    <figure className="mx-auto max-w-4xl px-6 py-8">
       <SmartImage
         image={block.image}
         sizes="(max-width: 896px) 100vw, 896px"
-        className="h-auto w-full rounded-lg"
+        className="h-auto w-full rounded-xl"
       />
       {block.image.caption && (
-        <figcaption className="mt-2 text-center text-sm text-muted">
+        <figcaption className="mt-3 text-center text-sm text-muted">
           {block.image.caption}
         </figcaption>
       )}
@@ -163,27 +262,28 @@ function Gallery({ block }: { block: GalleryBlock }) {
   const images = block.images.filter((img) => img.url);
   if (images.length === 0 && !block.heading) return null;
   return (
-    <section className="mx-auto max-w-6xl px-6 py-10">
-      {block.heading && (
-        <h2 className="mb-6 inline-block border-b-2 border-accent pb-1 text-2xl font-semibold">
-          {block.heading}
-        </h2>
-      )}
-      <div className={`grid grid-cols-1 gap-4 ${cols}`}>
+    <section className="mx-auto max-w-6xl px-6 py-12 sm:py-16">
+      {block.heading && <SectionHeading title={block.heading} />}
+      <div className={`grid grid-cols-1 gap-5 ${cols}`}>
         {images.map((img, i) => (
-          <figure key={i} className="group">
-            <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-card shadow-sm transition duration-300 group-hover:shadow-md">
+          <figure
+            key={i}
+            className="group relative overflow-hidden rounded-xl bg-card shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+          >
+            <div className="relative aspect-square w-full overflow-hidden">
               <Image
                 src={img.url}
                 alt={img.alt ?? ""}
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                className="object-cover transition duration-300 group-hover:scale-105"
+                className="object-cover transition duration-500 group-hover:scale-105"
               />
             </div>
             {img.caption && (
-              <figcaption className="mt-2 text-sm text-muted">
-                {img.caption}
+              <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end bg-gradient-to-t from-black/65 to-transparent p-4 opacity-0 transition duration-300 group-hover:opacity-100">
+                <span className="text-sm font-medium text-white">
+                  {img.caption}
+                </span>
               </figcaption>
             )}
           </figure>
@@ -197,7 +297,7 @@ function Columns({ block }: { block: ColumnsBlock }) {
   const count = Math.min(Math.max(block.columns.length, 1), 6);
   const cols = gridColsClass[count] ?? gridColsClass[3];
   return (
-    <section className="mx-auto max-w-6xl px-6 py-10">
+    <section className="mx-auto max-w-4xl px-6 py-12 sm:py-16">
       <div className={`grid grid-cols-1 gap-8 ${cols}`}>
         {block.columns.map((col, i) => (
           <div key={i} className="space-y-3">
@@ -205,7 +305,7 @@ function Columns({ block }: { block: ColumnsBlock }) {
               <SmartImage
                 image={col.image}
                 sizes="(max-width: 640px) 100vw, 33vw"
-                className="h-auto w-full rounded-lg"
+                className="h-auto w-full rounded-xl"
               />
             )}
             {col.heading && (
@@ -219,12 +319,108 @@ function Columns({ block }: { block: ColumnsBlock }) {
   );
 }
 
+function Profile({
+  block,
+  settings,
+}: {
+  block: ProfileBlock;
+  settings?: SiteSettings;
+}) {
+  const socials = settings?.socials ?? {};
+  const socialLinks: { url?: string; name: SocialName; label: string }[] = [
+    { url: socials.instagram, name: "instagram", label: "Instagram" },
+    { url: socials.facebook, name: "facebook", label: "Facebook" },
+    {
+      url: socials.email ? `mailto:${socials.email}` : undefined,
+      name: "email",
+      label: "Email",
+    },
+  ].filter((s) => s.url);
+
+  const details = block.details?.filter((d) => d.value.trim().length > 0) ?? [];
+
+  return (
+    <section className="bg-surface">
+      <div className="mx-auto grid max-w-5xl items-center gap-10 px-6 py-16 sm:py-20 md:grid-cols-[0.8fr_1fr]">
+        {block.image?.url && (
+          <div className="relative mx-auto w-full max-w-xs">
+            <div className="absolute -bottom-4 -left-4 h-full w-full rounded-2xl border-2 border-accent/40" />
+            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl shadow-sm">
+              <Image
+                src={block.image.url}
+                alt={block.image.alt ?? block.heading}
+                fill
+                sizes="(max-width: 768px) 80vw, 320px"
+                className="object-cover"
+              />
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-5">
+          {block.eyebrow && <Eyebrow>{block.eyebrow}</Eyebrow>}
+          <h2 className="text-2xl font-semibold sm:text-3xl">{block.heading}</h2>
+          {block.body && (
+            <div className="space-y-3 text-muted">
+              <Paragraphs text={block.body} />
+            </div>
+          )}
+
+          {details.length > 0 && (
+            <dl className="grid grid-cols-1 gap-x-8 gap-y-2 sm:grid-cols-2">
+              {details.map((d, i) => (
+                <div key={i} className="flex gap-2 text-sm">
+                  <dt className="font-medium">{d.label}:</dt>
+                  <dd className="text-muted">
+                    {d.value.includes("@") && !d.value.includes(" ") ? (
+                      <a
+                        href={`mailto:${d.value}`}
+                        className="transition hover:text-accent"
+                      >
+                        {d.value}
+                      </a>
+                    ) : (
+                      d.value
+                    )}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )}
+
+          {socialLinks.length > 0 && (
+            <div className="flex items-center gap-3 pt-1">
+              <span className="text-sm font-medium">Follow me</span>
+              {socialLinks.map(({ url, name, label }) => (
+                <a
+                  key={label}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-line text-muted transition hover:border-accent hover:text-accent"
+                >
+                  <SocialIcon name={name} size={16} />
+                </a>
+              ))}
+            </div>
+          )}
+
+          {block.ctaText && block.ctaUrl && (
+            <CtaButtons primary={block.ctaText} primaryUrl={block.ctaUrl} />
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function VideoEmbed({ block }: { block: VideoEmbedBlock }) {
   const embed = getEmbedUrl(block.url);
   if (!embed) return null;
   return (
-    <section className="mx-auto max-w-4xl px-6 py-8">
-      <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-black">
+    <section className="mx-auto max-w-4xl px-6 py-10">
+      <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-black">
         <iframe
           src={embed}
           title={block.caption || "Embedded video"}
@@ -234,35 +430,51 @@ function VideoEmbed({ block }: { block: VideoEmbedBlock }) {
         />
       </div>
       {block.caption && (
-        <p className="mt-2 text-center text-sm text-muted">{block.caption}</p>
+        <p className="mt-3 text-center text-sm text-muted">{block.caption}</p>
       )}
     </section>
   );
 }
 
-function renderBlock(block: Block) {
+function renderBlock(block: Block, settings?: SiteSettings) {
   switch (block.type) {
     case "hero":
-      return <Hero key={block.id} block={block} />;
+      return <Hero block={block} />;
     case "rich_text":
-      return <RichText key={block.id} block={block} />;
+      return <RichText block={block} />;
     case "image":
-      return <SingleImage key={block.id} block={block} />;
+      return <SingleImage block={block} />;
     case "gallery":
-      return <Gallery key={block.id} block={block} />;
+      return <Gallery block={block} />;
     case "columns":
-      return <Columns key={block.id} block={block} />;
+      return <Columns block={block} />;
+    case "profile":
+      return <Profile block={block} settings={settings} />;
     case "video_embed":
-      return <VideoEmbed key={block.id} block={block} />;
+      return <VideoEmbed block={block} />;
     case "divider":
       return (
-        <div key={block.id} className="mx-auto max-w-5xl px-6">
+        <div className="mx-auto max-w-4xl px-6">
           <hr className="border-line" />
         </div>
       );
   }
 }
 
-export default function BlockRenderer({ blocks }: { blocks: Block[] }) {
-  return <>{blocks.map(renderBlock)}</>;
+export default function BlockRenderer({
+  blocks,
+  settings,
+}: {
+  blocks: Block[];
+  settings?: SiteSettings;
+}) {
+  return (
+    <>
+      {blocks.map((block, i) => (
+        <Reveal key={block.id} delay={Math.min(i, 3) * 0.04}>
+          {renderBlock(block, settings)}
+        </Reveal>
+      ))}
+    </>
+  );
 }

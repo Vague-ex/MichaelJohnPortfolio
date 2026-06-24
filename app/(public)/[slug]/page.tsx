@@ -37,12 +37,15 @@ export default async function DynamicPage({
   // "home" is served at "/" — don't duplicate it here.
   if (slug === "home") notFound();
 
-  const page = await getPageBySlug(slug);
+  const [page, settings] = await Promise.all([
+    getPageBySlug(slug),
+    getSiteSettings(),
+  ]);
   if (!page) notFound();
 
   return (
     <main>
-      <BlockRenderer blocks={page.content ?? []} />
+      <BlockRenderer blocks={page.content ?? []} settings={settings} />
     </main>
   );
 }

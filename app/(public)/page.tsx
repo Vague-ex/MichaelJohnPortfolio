@@ -18,11 +18,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const page = await getPageBySlug("home");
+  const [page, settings] = await Promise.all([
+    getPageBySlug("home"),
+    getSiteSettings(),
+  ]);
 
   if (!page) {
     return (
-      <main className="mx-auto max-w-2xl px-6 py-24 text-center text-neutral-500">
+      <main className="mx-auto max-w-2xl px-6 py-24 text-center text-muted">
         <p>This portfolio is being set up. Please check back soon.</p>
       </main>
     );
@@ -30,7 +33,7 @@ export default async function HomePage() {
 
   return (
     <main>
-      <BlockRenderer blocks={page.content ?? []} />
+      <BlockRenderer blocks={page.content ?? []} settings={settings} />
     </main>
   );
 }

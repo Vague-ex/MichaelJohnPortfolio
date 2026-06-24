@@ -21,6 +21,10 @@ export const BLOCK_META: Record<
     label: "Columns",
     description: "Side-by-side columns of text and images",
   },
+  profile: {
+    label: "Biography / profile",
+    description: "Photo, bio, personal details, and social links",
+  },
   video_embed: {
     label: "Video",
     description: "Embed a YouTube or Vimeo link",
@@ -30,6 +34,7 @@ export const BLOCK_META: Record<
 
 export const BLOCK_ORDER: BlockType[] = [
   "hero",
+  "profile",
   "rich_text",
   "image",
   "gallery",
@@ -52,6 +57,20 @@ export function createBlock(type: BlockType): Block {
       return { id, type, heading: "", columns: 3, images: [] };
     case "columns":
       return { id, type, columns: [{ text: "" }, { text: "" }] };
+    case "profile":
+      return {
+        id,
+        type,
+        eyebrow: "My Biography",
+        heading: "About me",
+        body: "",
+        details: [
+          { label: "Name", value: "" },
+          { label: "Email", value: "" },
+        ],
+        ctaText: "",
+        ctaUrl: "",
+      };
     case "video_embed":
       return { id, type, url: "", caption: "" };
     case "divider":

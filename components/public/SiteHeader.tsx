@@ -19,41 +19,54 @@ export default function SiteHeader({
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
+  const hasContact = items.some((i) => i.href === "/contact");
+
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-background/85 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Link
           href="/"
-          className="text-lg font-semibold tracking-tight transition hover:text-accent"
+          className="font-display text-lg font-semibold tracking-tight transition hover:text-accent"
         >
           {siteTitle}
         </Link>
 
-        <nav className="hidden gap-6 text-sm sm:flex">
-          {items.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={
-                pathname === item.href
-                  ? "font-medium text-accent"
-                  : "text-muted transition hover:text-foreground"
-              }
-            >
-              {item.title}
-            </Link>
-          ))}
-        </nav>
+        <div className="flex items-center gap-6">
+          <nav className="hidden gap-6 text-sm sm:flex">
+            {items.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={
+                  pathname === item.href
+                    ? "font-medium text-accent"
+                    : "text-muted transition hover:text-foreground"
+                }
+              >
+                {item.title}
+              </Link>
+            ))}
+          </nav>
 
-        <button
-          onClick={() => setOpen((v) => !v)}
-          className="sm:hidden"
-          aria-label="Toggle menu"
-        >
-          <span className="block h-0.5 w-6 bg-foreground" />
-          <span className="mt-1.5 block h-0.5 w-6 bg-foreground" />
-          <span className="mt-1.5 block h-0.5 w-6 bg-foreground" />
-        </button>
+          {hasContact && (
+            <Link
+              href="/contact"
+              className="hidden rounded-full bg-accent px-5 py-2 text-sm font-medium text-white transition hover:bg-accent-dark sm:inline-block"
+            >
+              Hire me
+            </Link>
+          )}
+
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className="sm:hidden"
+            aria-label="Toggle menu"
+          >
+            <span className="block h-0.5 w-6 bg-foreground" />
+            <span className="mt-1.5 block h-0.5 w-6 bg-foreground" />
+            <span className="mt-1.5 block h-0.5 w-6 bg-foreground" />
+          </button>
+        </div>
       </div>
 
       {open && (

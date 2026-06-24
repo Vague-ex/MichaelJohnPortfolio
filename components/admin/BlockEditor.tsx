@@ -6,6 +6,7 @@ import type {
   Block,
   ColumnItem,
   ImageRef,
+  ProfileDetail,
   TextAlign,
 } from "@/lib/types";
 
@@ -60,6 +61,14 @@ export default function BlockEditor({
     case "hero":
       return (
         <div className="space-y-3">
+          <Field label="Eyebrow (small label above heading)">
+            <input
+              className={inputClass}
+              placeholder="e.g. Hi, I'm"
+              value={block.eyebrow ?? ""}
+              onChange={(e) => onChange({ ...block, eyebrow: e.target.value })}
+            />
+          </Field>
           <Field label="Heading">
             <input
               className={inputClass}
@@ -80,12 +89,46 @@ export default function BlockEditor({
             value={block.align ?? "center"}
             onChange={(align) => onChange({ ...block, align })}
           />
-          <Field label="Background image (optional)">
+          <Field label="Photo / image (optional — shown beside the text)">
             <ImageInput
               value={block.image}
               onChange={(image) => onChange({ ...block, image })}
             />
           </Field>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field label="Button text">
+              <input
+                className={inputClass}
+                placeholder="e.g. View work"
+                value={block.ctaText ?? ""}
+                onChange={(e) => onChange({ ...block, ctaText: e.target.value })}
+              />
+            </Field>
+            <Field label="Button link">
+              <input
+                className={inputClass}
+                placeholder="/contact or https://…"
+                value={block.ctaUrl ?? ""}
+                onChange={(e) => onChange({ ...block, ctaUrl: e.target.value })}
+              />
+            </Field>
+            <Field label="Second button text (optional)">
+              <input
+                className={inputClass}
+                value={block.cta2Text ?? ""}
+                onChange={(e) =>
+                  onChange({ ...block, cta2Text: e.target.value })
+                }
+              />
+            </Field>
+            <Field label="Second button link">
+              <input
+                className={inputClass}
+                value={block.cta2Url ?? ""}
+                onChange={(e) => onChange({ ...block, cta2Url: e.target.value })}
+              />
+            </Field>
+          </div>
         </div>
       );
 
@@ -277,6 +320,115 @@ export default function BlockEditor({
           >
             + Add column
           </button>
+        </div>
+      );
+    }
+
+    case "profile": {
+      const updateDetail = (i: number, patch: Partial<ProfileDetail>) => {
+        const details = block.details.map((d, idx) =>
+          idx === i ? { ...d, ...patch } : d,
+        );
+        onChange({ ...block, details });
+      };
+      const removeDetail = (i: number) =>
+        onChange({
+          ...block,
+          details: block.details.filter((_, idx) => idx !== i),
+        });
+      return (
+        <div className="space-y-3">
+          <Field label="Photo">
+            <ImageInput
+              value={block.image}
+              onChange={(image) => onChange({ ...block, image })}
+            />
+          </Field>
+          <Field label="Eyebrow (small label)">
+            <input
+              className={inputClass}
+              placeholder="e.g. My Biography"
+              value={block.eyebrow ?? ""}
+              onChange={(e) => onChange({ ...block, eyebrow: e.target.value })}
+            />
+          </Field>
+          <Field label="Heading">
+            <input
+              className={inputClass}
+              value={block.heading}
+              onChange={(e) => onChange({ ...block, heading: e.target.value })}
+            />
+          </Field>
+          <Field label="Bio text">
+            <textarea
+              className={`${inputClass} min-h-28`}
+              value={block.body ?? ""}
+              onChange={(e) => onChange({ ...block, body: e.target.value })}
+            />
+          </Field>
+
+          <div className="space-y-2">
+            <span className="text-xs font-medium text-neutral-600">
+              Details (Name, Email, Phone, Location…)
+            </span>
+            {block.details.map((d, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <input
+                  className={`${inputClass} max-w-32`}
+                  placeholder="Label"
+                  value={d.label}
+                  onChange={(e) => updateDetail(i, { label: e.target.value })}
+                />
+                <input
+                  className={inputClass}
+                  placeholder="Value"
+                  value={d.value}
+                  onChange={(e) => updateDetail(i, { value: e.target.value })}
+                />
+                <button
+                  type="button"
+                  onClick={() => removeDetail(i)}
+                  className="shrink-0 rounded border border-neutral-300 px-2 py-1 text-xs text-red-600 hover:bg-red-50"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() =>
+                onChange({
+                  ...block,
+                  details: [...block.details, { label: "", value: "" }],
+                })
+              }
+              className="rounded-md border border-dashed border-neutral-400 px-3 py-1.5 text-sm hover:bg-neutral-100"
+            >
+              + Add detail
+            </button>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field label="Button text (optional)">
+              <input
+                className={inputClass}
+                placeholder="e.g. Download CV"
+                value={block.ctaText ?? ""}
+                onChange={(e) => onChange({ ...block, ctaText: e.target.value })}
+              />
+            </Field>
+            <Field label="Button link">
+              <input
+                className={inputClass}
+                value={block.ctaUrl ?? ""}
+                onChange={(e) => onChange({ ...block, ctaUrl: e.target.value })}
+              />
+            </Field>
+          </div>
+          <p className="text-xs text-neutral-500">
+            Social icons (Instagram, Facebook, Email) come from{" "}
+            <span className="font-medium">Site settings</span>.
+          </p>
         </div>
       );
     }
