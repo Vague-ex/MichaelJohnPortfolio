@@ -84,6 +84,34 @@ export interface Album {
   images: ImageRef[]; // each image's `caption` is its title in the viewer
 }
 
+export interface TimelineEntry {
+  id: string;
+  heading: string; // what he did
+  time: string; // e.g. "2022 - 2026" or "Dec 2020"
+  description?: string;
+}
+
+export interface TimelineBlock {
+  id: string;
+  type: "timeline";
+  heading?: string; // left-column label, e.g. "Experience"
+  subtitle?: string; // small uppercase subtitle under the label
+  entries: TimelineEntry[]; // ordered newest first (top = latest)
+}
+
+export interface BulletColumn {
+  id: string;
+  heading?: string;
+  items: string[];
+}
+
+export interface BulletListBlock {
+  id: string;
+  type: "bullet_list";
+  heading?: string;
+  columns: BulletColumn[]; // up to 3
+}
+
 export interface ImageAlbumBlock {
   id: string;
   type: "image_album";
@@ -117,6 +145,8 @@ export type Block =
   | VideoEmbedBlock
   | ProfileBlock
   | ImageAlbumBlock
+  | TimelineBlock
+  | BulletListBlock
   | DividerBlock;
 
 export type BlockType = Block["type"];

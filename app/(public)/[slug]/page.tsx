@@ -17,10 +17,10 @@ export async function generateMetadata({
   ]);
   if (!page) return {};
   return {
-    title: `${page.title} — ${settings.site_title}`,
+    title: `${page.title} | ${settings.site_title}`,
     description: settings.tagline,
     openGraph: {
-      title: `${page.title} — ${settings.site_title}`,
+      title: `${page.title} | ${settings.site_title}`,
       description: settings.tagline,
       type: "website",
     },

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type {
   Block,
+  BulletListBlock,
   ColumnsBlock,
   GalleryBlock,
   HeroBlock,
@@ -10,6 +11,7 @@ import type {
   RichTextBlock,
   SiteSettings,
   TextAlign,
+  TimelineBlock,
   VideoEmbedBlock,
 } from "@/lib/types";
 import { getEmbedUrl } from "@/lib/blocks";
@@ -418,6 +420,107 @@ function Profile({
   );
 }
 
+function Timeline({ block }: { block: TimelineBlock }) {
+  const entries = block.entries.filter(
+    (e) => e.heading.trim() || e.time.trim() || (e.description ?? "").trim(),
+  );
+  return (
+    <section className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
+      <div className="grid gap-4 sm:grid-cols-12">
+        <div className="sm:col-span-3">
+          <div className="mb-8 text-center sm:mb-0 sm:text-left">
+            <span className="mx-auto mb-4 block h-2.5 w-20 rounded-md bg-accent sm:mx-0" />
+            {block.heading && (
+              <h3 className="text-2xl font-semibold">{block.heading}</h3>
+            )}
+            {block.subtitle && (
+              <span className="text-sm font-bold uppercase tracking-wider text-muted">
+                {block.subtitle}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="sm:col-span-9">
+          <div className="relative pl-8">
+            <span className="pointer-events-none absolute bottom-1 left-[7px] top-2 w-0.5 bg-accent/40" />
+            <div className="space-y-8">
+              {entries.map((e) => (
+                <div key={e.id} className="relative">
+                  <span className="absolute -left-[27px] top-1.5 h-3.5 w-3.5 rounded-[3px] bg-accent ring-4 ring-background" />
+                  <h4 className="text-lg font-semibold tracking-wide">
+                    {e.heading}
+                  </h4>
+                  {e.time && (
+                    <time className="block text-xs font-medium uppercase tracking-wide text-muted">
+                      {e.time}
+                    </time>
+                  )}
+                  {e.description && (
+                    <p className="mt-2 leading-relaxed text-muted">
+                      {e.description}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CheckMark() {
+  return (
+    <svg
+      className="mt-0.5 h-4 w-4 shrink-0 text-accent"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.5}
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+  );
+}
+
+function BulletList({ block }: { block: BulletListBlock }) {
+  const count = Math.min(Math.max(block.columns.length, 1), 3);
+  const cols =
+    count === 1
+      ? ""
+      : count === 2
+        ? "sm:grid-cols-2"
+        : "sm:grid-cols-2 lg:grid-cols-3";
+  return (
+    <section className="mx-auto max-w-4xl px-6 py-12 sm:py-16">
+      {block.heading && <SectionHeading title={block.heading} />}
+      <div className={`grid grid-cols-1 gap-8 ${cols}`}>
+        {block.columns.map((col) => (
+          <div key={col.id}>
+            <span className="mb-3 block h-2 w-10 rounded-md bg-accent" />
+            {col.heading && (
+              <h3 className="mb-3 text-lg font-semibold">{col.heading}</h3>
+            )}
+            <ul className="space-y-2.5">
+              {col.items
+                .filter((item) => item.trim().length > 0)
+                .map((item, i) => (
+                  <li key={i} className="flex items-start gap-2.5">
+                    <CheckMark />
+                    <span className="text-muted">{item}</span>
+                  </li>
+                ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function VideoEmbed({ block }: { block: VideoEmbedBlock }) {
   const embed = getEmbedUrl(block.url);
   if (!embed) return null;
@@ -453,6 +556,10 @@ function renderBlock(block: Block, settings?: SiteSettings) {
       return <Columns block={block} />;
     case "image_album":
       return <ImageAlbum block={block} />;
+    case "timeline":
+      return <Timeline block={block} />;
+    case "bullet_list":
+      return <BulletList block={block} />;
     case "profile":
       return <Profile block={block} settings={settings} />;
     case "video_embed":

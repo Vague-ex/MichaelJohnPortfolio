@@ -5,10 +5,12 @@ import { getEmbedUrl, newId } from "@/lib/blocks";
 import type {
   Album,
   Block,
+  BulletColumn,
   ColumnItem,
   ImageRef,
   ProfileDetail,
   TextAlign,
+  TimelineEntry,
 } from "@/lib/types";
 
 const inputClass =
@@ -90,7 +92,7 @@ export default function BlockEditor({
             value={block.align ?? "center"}
             onChange={(align) => onChange({ ...block, align })}
           />
-          <Field label="Photo / image (optional — shown beside the text)">
+          <Field label="Photo / image (optional, shown beside the text)">
             <ImageInput
               value={block.image}
               onChange={(image) => onChange({ ...block, image })}
@@ -413,7 +415,7 @@ export default function BlockEditor({
                 />
               </Field>
 
-              <Field label="Cover image (optional — defaults to first image)">
+              <Field label="Cover image (optional, defaults to first image)">
                 <ImageInput
                   value={album.cover}
                   onChange={(cover) => updateAlbum(ai, { cover })}
@@ -484,6 +486,260 @@ export default function BlockEditor({
             className="rounded-md border border-dashed border-neutral-400 px-3 py-1.5 text-sm hover:bg-neutral-100"
           >
             + Add album
+          </button>
+        </div>
+      );
+    }
+
+    case "bullet_list": {
+      const updateColumn = (ci: number, patch: Partial<BulletColumn>) => {
+        const columns = block.columns.map((c, idx) =>
+          idx === ci ? { ...c, ...patch } : c,
+        );
+        onChange({ ...block, columns });
+      };
+      const moveColumn = (ci: number, dir: -1 | 1) => {
+        const j = ci + dir;
+        if (j < 0 || j >= block.columns.length) return;
+        const columns = [...block.columns];
+        [columns[ci], columns[j]] = [columns[j], columns[ci]];
+        onChange({ ...block, columns });
+      };
+      const removeColumn = (ci: number) =>
+        onChange({
+          ...block,
+          columns: block.columns.filter((_, idx) => idx !== ci),
+        });
+      const updateItem = (ci: number, ii: number, value: string) => {
+        const items = [...block.columns[ci].items];
+        items[ii] = value;
+        updateColumn(ci, { items });
+      };
+      const removeItem = (ci: number, ii: number) =>
+        updateColumn(ci, {
+          items: block.columns[ci].items.filter((_, idx) => idx !== ii),
+        });
+
+      return (
+        <div className="space-y-4">
+          <Field label="Section heading (optional)">
+            <input
+              className={inputClass}
+              value={block.heading ?? ""}
+              onChange={(e) => onChange({ ...block, heading: e.target.value })}
+            />
+          </Field>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {block.columns.map((col, ci) => (
+              <div
+                key={col.id}
+                className="space-y-2 rounded-lg border border-neutral-200 bg-neutral-50 p-3"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold">Column {ci + 1}</span>
+                  <div className="flex gap-1">
+                    <button
+                      type="button"
+                      onClick={() => moveColumn(ci, -1)}
+                      className="rounded border border-neutral-300 px-1.5 text-xs"
+                    >
+                      ←
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => moveColumn(ci, 1)}
+                      className="rounded border border-neutral-300 px-1.5 text-xs"
+                    >
+                      →
+                    </button>
+                    {block.columns.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeColumn(ci)}
+                        className="rounded border border-neutral-300 px-1.5 text-xs text-red-600 hover:bg-red-50"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <input
+                  className={inputClass}
+                  placeholder="Column title (e.g. Creative)"
+                  value={col.heading ?? ""}
+                  onChange={(e) => updateColumn(ci, { heading: e.target.value })}
+                />
+                <div className="space-y-1.5">
+                  {col.items.map((item, ii) => (
+                    <div key={ii} className="flex items-center gap-1">
+                      <input
+                        className={inputClass}
+                        placeholder="List item"
+                        value={item}
+                        onChange={(e) => updateItem(ci, ii, e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeItem(ci, ii)}
+                        className="shrink-0 rounded border border-neutral-300 px-2 py-1 text-xs text-red-600 hover:bg-red-50"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      updateColumn(ci, { items: [...col.items, ""] })
+                    }
+                    className="rounded-md border border-dashed border-neutral-400 px-2 py-1 text-xs hover:bg-neutral-100"
+                  >
+                    + Add item
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {block.columns.length < 3 && (
+            <button
+              type="button"
+              onClick={() =>
+                onChange({
+                  ...block,
+                  columns: [
+                    ...block.columns,
+                    { id: newId(), heading: "", items: [""] },
+                  ],
+                })
+              }
+              className="rounded-md border border-dashed border-neutral-400 px-3 py-1.5 text-sm hover:bg-neutral-100"
+            >
+              + Add column (max 3)
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    case "timeline": {
+      const updateEntry = (i: number, patch: Partial<TimelineEntry>) => {
+        const entries = block.entries.map((en, idx) =>
+          idx === i ? { ...en, ...patch } : en,
+        );
+        onChange({ ...block, entries });
+      };
+      const moveEntry = (i: number, dir: -1 | 1) => {
+        const j = i + dir;
+        if (j < 0 || j >= block.entries.length) return;
+        const entries = [...block.entries];
+        [entries[i], entries[j]] = [entries[j], entries[i]];
+        onChange({ ...block, entries });
+      };
+      const removeEntry = (i: number) =>
+        onChange({
+          ...block,
+          entries: block.entries.filter((_, idx) => idx !== i),
+        });
+
+      return (
+        <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field label="Label (e.g. Experience)">
+              <input
+                className={inputClass}
+                value={block.heading ?? ""}
+                onChange={(e) => onChange({ ...block, heading: e.target.value })}
+              />
+            </Field>
+            <Field label="Subtitle (optional)">
+              <input
+                className={inputClass}
+                value={block.subtitle ?? ""}
+                onChange={(e) =>
+                  onChange({ ...block, subtitle: e.target.value })
+                }
+              />
+            </Field>
+          </div>
+
+          <p className="text-xs text-neutral-500">
+            The top entry shows first, so put the most recent at the top.
+          </p>
+
+          {block.entries.map((en, i) => (
+            <div
+              key={en.id}
+              className="space-y-2 rounded-lg border border-neutral-200 bg-neutral-50 p-3"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold">Entry {i + 1}</span>
+                <div className="flex gap-1">
+                  <button
+                    type="button"
+                    onClick={() => moveEntry(i, -1)}
+                    className="rounded border border-neutral-300 px-1.5 text-xs"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveEntry(i, 1)}
+                    className="rounded border border-neutral-300 px-1.5 text-xs"
+                  >
+                    ↓
+                  </button>
+                  {block.entries.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeEntry(i)}
+                      className="rounded border border-neutral-300 px-1.5 text-xs text-red-600 hover:bg-red-50"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <input
+                  className={inputClass}
+                  placeholder="What he did (e.g. Data Encoder, Woflow Inc.)"
+                  value={en.heading}
+                  onChange={(e) => updateEntry(i, { heading: e.target.value })}
+                />
+                <input
+                  className={inputClass}
+                  placeholder="When (e.g. 2022 - 2026)"
+                  value={en.time}
+                  onChange={(e) => updateEntry(i, { time: e.target.value })}
+                />
+              </div>
+              <textarea
+                className={`${inputClass} min-h-20`}
+                placeholder="Description (optional)"
+                value={en.description ?? ""}
+                onChange={(e) =>
+                  updateEntry(i, { description: e.target.value })
+                }
+              />
+            </div>
+          ))}
+
+          <button
+            type="button"
+            onClick={() =>
+              onChange({
+                ...block,
+                entries: [
+                  ...block.entries,
+                  { id: newId(), heading: "", time: "", description: "" },
+                ],
+              })
+            }
+            className="rounded-md border border-dashed border-neutral-400 px-3 py-1.5 text-sm hover:bg-neutral-100"
+          >
+            + Add entry
           </button>
         </div>
       );

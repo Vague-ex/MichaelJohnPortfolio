@@ -13,12 +13,12 @@
 -- Site identity ------------------------------------------------------------
 update public.site_settings
 set site_title = 'Michael John Aguilar',
-    tagline    = 'Digital Media Artist & Graphic Designer — Negros Occidental',
+    tagline    = 'Digital Media Artist & Graphic Designer based in Negros Occidental',
     socials    = '{"facebook":"https://facebook.com/miiiijii.aguilar","instagram":"","email":"michaeljohnaguilar.work@gmail.com"}'::jsonb;
 
 insert into public.site_settings (site_title, tagline, socials)
 select 'Michael John Aguilar',
-       'Digital Media Artist & Graphic Designer — Negros Occidental',
+       'Digital Media Artist & Graphic Designer based in Negros Occidental',
        '{"facebook":"https://facebook.com/miiiijii.aguilar","instagram":"","email":"michaeljohnaguilar.work@gmail.com"}'::jsonb
 where not exists (select 1 from public.site_settings);
 
@@ -28,7 +28,7 @@ values
   ('home', 'Work', 0, true, true,
    '[
      {"id":"home-hero","type":"hero","eyebrow":"Hi, I am","heading":"Michael John Aguilar","subheading":"Digital Media Artist & Graphic Designer based in Negros Occidental.","align":"center","ctaText":"Get in touch","ctaUrl":"/contact"},
-     {"id":"home-intro","type":"rich_text","align":"center","text":"Fine Arts graduate majoring in Digital Media Arts — creating logos, shirt graphics, digital illustrations, and murals for brands and creators."},
+     {"id":"home-intro","type":"rich_text","align":"center","text":"Fine Arts graduate majoring in Digital Media Arts, creating logos, shirt graphics, digital illustrations, and murals for brands and creators."},
      {"id":"home-work","type":"gallery","heading":"Selected Work","columns":3,"images":[]},
      {"id":"home-albums","type":"image_album","heading":"Collections","albums":[{"id":"album-tshirt","title":"T-Shirt Designs","images":[]},{"id":"album-canvas","title":"Canvas Paintings","images":[]}]}
    ]'::jsonb),
@@ -36,15 +36,20 @@ values
   ('about', 'About', 1, true, true,
    '[
      {"id":"about-bio","type":"profile","eyebrow":"My Biography","heading":"Digital Media Artist & Graphic Designer","body":"Creative and detail-oriented Fine Arts graduate majoring in Digital Media Arts, with experience in graphic design, digital illustration, and multimedia content creation. Skilled in creating engaging visual designs for digital and print platforms.","details":[{"label":"Name","value":"Michael John Aguilar"},{"label":"Email","value":"michaeljohnaguilar.work@gmail.com"},{"label":"Phone","value":"0945 386 9496"},{"label":"Location","value":"E.B. Magalona, Negros Occidental"}],"ctaText":"","ctaUrl":""},
-     {"id":"about-div1","type":"divider"},
-     {"id":"about-skills","type":"columns","columns":[
-        {"heading":"Creative","text":"Graphic Design & Digital Illustration\nMural & Visual Arts\nMultimedia Content Creation\nLogo & Shirt Design"},
-        {"heading":"Technical","text":"Data Encoding & Verification\nData Quality Control & Compliance\nMicrosoft Office & Google Workspace\nEmail & File Management"}
+     {"id":"about-skills","type":"bullet_list","heading":"Skills","columns":[
+        {"id":"sk-creative","heading":"Creative","items":["Graphic Design & Digital Illustration","Mural & Visual Arts","Multimedia Content Creation","Logo & Shirt Design"]},
+        {"id":"sk-technical","heading":"Technical","items":["Data Encoding & Verification","Data Quality Control & Compliance","Microsoft Office & Google Workspace","Email & File Management"]}
      ]},
-     {"id":"about-div2","type":"divider"},
-     {"id":"about-exp","type":"rich_text","heading":"Experience","text":"Data Encoder — Woflow Inc. (2022–2026)\nEncoded and verified merchant transaction data to maintain a 99% accuracy rate. Managed reports, merchants, and archives, and trained new encoders to ensure compliance with standards.\n\nPersonal Assistant — Jonathan Berg (2021–2022)\nManaged email correspondence, schedules, and documents while maintaining confidentiality and smooth daily operations.\n\nFreelance Graphic Designer — Keep Up Marketing (2018–2021)\nDesigned 100+ logos and shirt graphics for small businesses and YouTube creators, plus posters, banners, and packaging.\n\nArtist — Audacity Studio (2018–2019)\nContributed to mural projects and studio installations, taking visual design projects from concept to completion."},
-     {"id":"about-div3","type":"divider"},
-     {"id":"about-edu","type":"rich_text","heading":"Education","text":"Bachelor of Science in Digital Media Arts (DMA)\nLa Consolacion College — Bacolod, 2019 · Best in Research Thesis Paper\n\nComputer Engineering (one year)\nColegio San Agustin — Bacolod City, 2014–2015"}
+     {"id":"about-exp","type":"timeline","heading":"Experience","subtitle":"Where I have worked","entries":[
+        {"id":"exp-woflow","heading":"Data Encoder, Woflow Inc.","time":"2022 - 2026","description":"Encoded and verified merchant transaction data to maintain a 99% accuracy rate. Managed reports, merchants, and archives, and trained new encoders to ensure compliance with standards."},
+        {"id":"exp-pa","heading":"Personal Assistant, Jonathan Berg","time":"2021 - 2022","description":"Managed email correspondence, schedules, and documents while maintaining confidentiality and smooth daily operations."},
+        {"id":"exp-keepup","heading":"Freelance Graphic Designer, Keep Up Marketing","time":"2018 - 2021","description":"Designed 100+ logos and shirt graphics for small businesses and YouTube creators, plus posters, banners, and packaging."},
+        {"id":"exp-audacity","heading":"Artist, Audacity Studio","time":"2018 - 2019","description":"Contributed to mural projects and studio installations, taking visual design projects from concept to completion."}
+     ]},
+     {"id":"about-edu","type":"timeline","heading":"Education","subtitle":"What I studied","entries":[
+        {"id":"edu-dma","heading":"BS in Digital Media Arts (DMA)","time":"2019","description":"La Consolacion College, Bacolod. Best in Research Thesis Paper."},
+        {"id":"edu-ce","heading":"Computer Engineering (one year)","time":"2014 - 2015","description":"Colegio San Agustin, Bacolod City."}
+     ]}
    ]'::jsonb),
 
   ('contact', 'Contact', 2, true, true,

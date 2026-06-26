@@ -15,11 +15,19 @@ export const BLOCK_META: Record<
   image: { label: "Single image", description: "One image with a caption" },
   gallery: {
     label: "Image gallery",
-    description: "A grid of images — choose how many columns",
+    description: "A grid of images, choose how many columns",
   },
   columns: {
     label: "Columns",
     description: "Side-by-side columns of text and images",
+  },
+  bullet_list: {
+    label: "Bullet list",
+    description: "Lists of points in up to 3 columns (great for skills)",
+  },
+  timeline: {
+    label: "Timeline",
+    description: "Vertical timeline for experience or education",
   },
   image_album: {
     label: "Image album",
@@ -44,6 +52,8 @@ export const BLOCK_ORDER: BlockType[] = [
   "gallery",
   "image_album",
   "columns",
+  "bullet_list",
+  "timeline",
   "video_embed",
   "divider",
 ];
@@ -68,6 +78,23 @@ export function createBlock(type: BlockType): Block {
         type,
         heading: "Collections",
         albums: [{ id: newId(), title: "New album", images: [] }],
+      };
+    case "bullet_list":
+      return {
+        id,
+        type,
+        heading: "",
+        columns: [{ id: newId(), heading: "", items: [""] }],
+      };
+    case "timeline":
+      return {
+        id,
+        type,
+        heading: "Experience",
+        subtitle: "",
+        entries: [
+          { id: newId(), heading: "", time: "", description: "" },
+        ],
       };
     case "profile":
       return {

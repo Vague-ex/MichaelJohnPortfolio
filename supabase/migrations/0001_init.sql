@@ -134,7 +134,7 @@ create policy media_storage_delete on storage.objects
 -- ---------------------------------------------------------------------------
 
 insert into public.site_settings (site_title, tagline, socials)
-select 'Michael John Aguilar', 'Visual Artist & Designer — Bacolod City',
+select 'Michael John Aguilar', 'Visual Artist & Designer, Bacolod City',
        '{"facebook":"https://facebook.com/miiiijii.aguilar","instagram":"","email":""}'::jsonb
 where not exists (select 1 from public.site_settings);
 
@@ -142,7 +142,7 @@ insert into public.pages (slug, title, nav_order, published, show_in_nav, conten
 values
   ('home', 'Work', 0, true, true,
    '[
-     {"id":"seedhero","type":"hero","heading":"Michael John Aguilar","subheading":"Visual Artist & Designer — Bacolod City","align":"center"},
+     {"id":"seedhero","type":"hero","heading":"Michael John Aguilar","subheading":"Visual Artist & Designer, Bacolod City","align":"center"},
      {"id":"seedgal","type":"gallery","heading":"Selected Work","columns":3,"images":[]}
    ]'::jsonb),
   ('about', 'About', 1, true, true,
