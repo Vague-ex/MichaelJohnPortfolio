@@ -69,7 +69,7 @@ export default function SiteHeader({
               {...(gmailHref
                 ? { target: "_blank", rel: "noopener noreferrer" }
                 : {})}
-              className="hidden rounded-full bg-accent px-5 py-2 text-sm font-medium text-white transition hover:bg-accent-dark sm:inline-block"
+              className="btn-shine hidden rounded-full bg-accent px-6 py-2 text-sm font-medium text-white shadow-sm transition duration-300 hover:-translate-y-0.5 hover:bg-accent-dark hover:shadow-[0_8px_24px_rgba(224,97,58,0.45)] sm:inline-block"
             >
               Hire me
             </a>

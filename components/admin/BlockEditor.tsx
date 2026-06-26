@@ -7,6 +7,8 @@ import type {
   Block,
   BulletColumn,
   ColumnItem,
+  ContactIcon,
+  ContactItem,
   ImageRef,
   ProfileDetail,
   TextAlign,
@@ -619,6 +621,122 @@ export default function BlockEditor({
               + Add column (max 3)
             </button>
           )}
+        </div>
+      );
+    }
+
+    case "contact": {
+      const updateItem = (i: number, patch: Partial<ContactItem>) => {
+        const items = block.items.map((it, idx) =>
+          idx === i ? { ...it, ...patch } : it,
+        );
+        onChange({ ...block, items });
+      };
+      const moveItem = (i: number, dir: -1 | 1) => {
+        const j = i + dir;
+        if (j < 0 || j >= block.items.length) return;
+        const items = [...block.items];
+        [items[i], items[j]] = [items[j], items[i]];
+        onChange({ ...block, items });
+      };
+      const removeItem = (i: number) =>
+        onChange({ ...block, items: block.items.filter((_, idx) => idx !== i) });
+
+      return (
+        <div className="space-y-3">
+          <Field label="Heading (optional)">
+            <input
+              className={inputClass}
+              value={block.heading ?? ""}
+              onChange={(e) => onChange({ ...block, heading: e.target.value })}
+            />
+          </Field>
+          <Field label="Intro text (optional)">
+            <textarea
+              className={`${inputClass} min-h-16`}
+              value={block.intro ?? ""}
+              onChange={(e) => onChange({ ...block, intro: e.target.value })}
+            />
+          </Field>
+
+          <div className="space-y-2">
+            <span className="text-xs font-medium text-neutral-600">
+              Contact rows
+            </span>
+            {block.items.map((item, i) => (
+              <div
+                key={item.id}
+                className="space-y-2 rounded-md border border-neutral-200 bg-neutral-50 p-2"
+              >
+                <div className="flex items-center gap-2">
+                  <select
+                    className={`${inputClass} max-w-36`}
+                    value={item.icon}
+                    onChange={(e) =>
+                      updateItem(i, { icon: e.target.value as ContactIcon })
+                    }
+                  >
+                    <option value="email">Email icon</option>
+                    <option value="phone">Phone icon</option>
+                    <option value="location">Location icon</option>
+                    <option value="website">Website icon</option>
+                  </select>
+                  <input
+                    className={`${inputClass} max-w-32`}
+                    placeholder="Label"
+                    value={item.label ?? ""}
+                    onChange={(e) => updateItem(i, { label: e.target.value })}
+                  />
+                  <div className="ml-auto flex gap-1">
+                    <button
+                      type="button"
+                      onClick={() => moveItem(i, -1)}
+                      className="rounded border border-neutral-300 px-1.5 text-xs"
+                    >
+                      ↑
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => moveItem(i, 1)}
+                      className="rounded border border-neutral-300 px-1.5 text-xs"
+                    >
+                      ↓
+                    </button>
+                    {block.items.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeItem(i)}
+                        className="rounded border border-neutral-300 px-1.5 text-xs text-red-600 hover:bg-red-50"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <input
+                  className={inputClass}
+                  placeholder="Value (e.g. name@email.com, 0945 386 9496, City)"
+                  value={item.value}
+                  onChange={(e) => updateItem(i, { value: e.target.value })}
+                />
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() =>
+                onChange({
+                  ...block,
+                  items: [
+                    ...block.items,
+                    { id: newId(), icon: "email", label: "", value: "" },
+                  ],
+                })
+              }
+              className="rounded-md border border-dashed border-neutral-400 px-3 py-1.5 text-sm hover:bg-neutral-100"
+            >
+              + Add row
+            </button>
+          </div>
         </div>
       );
     }

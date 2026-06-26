@@ -54,7 +54,11 @@ values
 
   ('contact', 'Contact', 2, true, true,
    '[
-     {"id":"contact-head","type":"rich_text","heading":"Contact","text":"Let''s work together.\n\nEmail: michaeljohnaguilar.work@gmail.com\nPhone: 0945 386 9496\nLocation: E.B. Magalona, Negros Occidental"}
+     {"id":"contact-head","type":"contact","heading":"Get in touch","intro":"Let''s work together. Reach me through any of these.","items":[
+        {"id":"c-email","icon":"email","label":"Email","value":"michaeljohnaguilar.work@gmail.com"},
+        {"id":"c-phone","icon":"phone","label":"Phone","value":"0945 386 9496"},
+        {"id":"c-loc","icon":"location","label":"Location","value":"E.B. Magalona, Negros Occidental"}
+     ]}
    ]'::jsonb)
 on conflict (slug) do update
 set title       = excluded.title,

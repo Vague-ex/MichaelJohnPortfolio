@@ -77,6 +77,23 @@ export interface DividerBlock {
   type: "divider";
 }
 
+export type ContactIcon = "email" | "phone" | "location" | "website";
+
+export interface ContactItem {
+  id: string;
+  icon: ContactIcon;
+  label?: string;
+  value: string;
+}
+
+export interface ContactBlock {
+  id: string;
+  type: "contact";
+  heading?: string;
+  intro?: string;
+  items: ContactItem[];
+}
+
 export interface Album {
   id: string;
   title: string;
@@ -147,6 +164,7 @@ export type Block =
   | ImageAlbumBlock
   | TimelineBlock
   | BulletListBlock
+  | ContactBlock
   | DividerBlock;
 
 export type BlockType = Block["type"];

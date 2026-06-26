@@ -29,6 +29,10 @@ export const BLOCK_META: Record<
     label: "Timeline",
     description: "Vertical timeline for experience or education",
   },
+  contact: {
+    label: "Contact details",
+    description: "Phone, email, and location rows with icons",
+  },
   image_album: {
     label: "Image album",
     description: "Clickable albums (collections) that open to browse images",
@@ -54,6 +58,7 @@ export const BLOCK_ORDER: BlockType[] = [
   "columns",
   "bullet_list",
   "timeline",
+  "contact",
   "video_embed",
   "divider",
 ];
@@ -94,6 +99,18 @@ export function createBlock(type: BlockType): Block {
         subtitle: "",
         entries: [
           { id: newId(), heading: "", time: "", description: "" },
+        ],
+      };
+    case "contact":
+      return {
+        id,
+        type,
+        heading: "Get in touch",
+        intro: "",
+        items: [
+          { id: newId(), icon: "email", label: "Email", value: "" },
+          { id: newId(), icon: "phone", label: "Phone", value: "" },
+          { id: newId(), icon: "location", label: "Location", value: "" },
         ],
       };
     case "profile":

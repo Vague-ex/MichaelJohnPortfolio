@@ -1,8 +1,11 @@
 import Image from "next/image";
+import { Phone, Mail, MapPin, Globe } from "lucide-react";
 import type {
   Block,
   BulletListBlock,
   ColumnsBlock,
+  ContactBlock,
+  ContactIcon,
   GalleryBlock,
   HeroBlock,
   ImageBlock,
@@ -184,8 +187,11 @@ function Hero({ block }: { block: HeroBlock }) {
             />
           </div>
           <div className="relative mx-auto w-full max-w-sm">
-            <div className="absolute -right-4 -top-4 h-full w-full rounded-[2rem] bg-accent/15" />
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] shadow-sm">
+            {/* Coral accent block + a soft dark base so a dark/black-background
+                portrait reads as an intentional framed photo on the light page. */}
+            <div className="absolute -right-4 -top-4 h-full w-full rounded-[2rem] bg-accent/20" />
+            <div className="absolute -bottom-3 -left-3 h-2/3 w-2/3 rounded-[2rem] bg-foreground/5" />
+            <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-neutral-900 shadow-2xl ring-1 ring-black/10">
               <Image
                 src={block.image!.url}
                 alt={block.image!.alt ?? block.heading}
@@ -350,7 +356,7 @@ function Profile({
         {block.image?.url && (
           <div className="relative mx-auto w-full max-w-xs">
             <div className="absolute -bottom-4 -left-4 h-full w-full rounded-2xl border-2 border-accent/40" />
-            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl shadow-sm">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-neutral-900 shadow-xl ring-1 ring-black/10">
               <Image
                 src={block.image.url}
                 alt={block.image.alt ?? block.heading}
@@ -425,48 +431,106 @@ function Timeline({ block }: { block: TimelineBlock }) {
     (e) => e.heading.trim() || e.time.trim() || (e.description ?? "").trim(),
   );
   return (
-    <section className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
-      <div className="grid gap-4 sm:grid-cols-12">
-        <div className="sm:col-span-3">
-          <div className="mb-8 text-center sm:mb-0 sm:text-left">
-            <span className="mx-auto mb-4 block h-2.5 w-20 rounded-md bg-accent sm:mx-0" />
-            {block.heading && (
-              <h3 className="text-2xl font-semibold">{block.heading}</h3>
-            )}
-            {block.subtitle && (
-              <span className="text-sm font-bold uppercase tracking-wider text-muted">
-                {block.subtitle}
-              </span>
-            )}
-          </div>
+    <section className="mx-auto max-w-4xl px-6 py-12 sm:py-16">
+      {(block.heading || block.subtitle) && (
+        <div className="mb-8">
+          {block.heading && (
+            <h2 className="text-2xl font-semibold sm:text-3xl">
+              {block.heading}
+            </h2>
+          )}
+          {block.subtitle && (
+            <p className="mt-1 text-sm font-bold uppercase tracking-wider text-muted">
+              {block.subtitle}
+            </p>
+          )}
+          <span className="mt-3 block h-1 w-12 rounded-full bg-accent" />
         </div>
+      )}
 
-        <div className="sm:col-span-9">
-          <div className="relative pl-8">
-            <span className="pointer-events-none absolute bottom-1 left-[7px] top-2 w-0.5 bg-accent/40" />
-            <div className="space-y-8">
-              {entries.map((e) => (
-                <div key={e.id} className="relative">
-                  <span className="absolute -left-[27px] top-1.5 h-3.5 w-3.5 rounded-[3px] bg-accent ring-4 ring-background" />
-                  <h4 className="text-lg font-semibold tracking-wide">
-                    {e.heading}
-                  </h4>
-                  {e.time && (
-                    <time className="block text-xs font-medium uppercase tracking-wide text-muted">
-                      {e.time}
-                    </time>
-                  )}
-                  {e.description && (
-                    <p className="mt-2 leading-relaxed text-muted">
-                      {e.description}
-                    </p>
-                  )}
-                </div>
-              ))}
+      <div className="relative pl-8">
+        <span className="pointer-events-none absolute bottom-1 left-[7px] top-2 w-0.5 bg-accent/40" />
+        <div className="space-y-8">
+          {entries.map((e) => (
+            <div key={e.id} className="relative">
+              <span className="absolute -left-[27px] top-1.5 h-3.5 w-3.5 rounded-[3px] bg-accent ring-4 ring-background" />
+              <h4 className="text-lg font-semibold tracking-wide">
+                {e.heading}
+              </h4>
+              {e.time && (
+                <time className="block text-xs font-medium uppercase tracking-wide text-muted">
+                  {e.time}
+                </time>
+              )}
+              {e.description && (
+                <p className="mt-2 leading-relaxed text-muted">
+                  {e.description}
+                </p>
+              )}
             </div>
-          </div>
+          ))}
         </div>
       </div>
+    </section>
+  );
+}
+
+const contactIconMap = {
+  email: Mail,
+  phone: Phone,
+  location: MapPin,
+  website: Globe,
+} as const;
+
+function contactHref(icon: ContactIcon, value: string): string | undefined {
+  const v = value.trim();
+  if (!v) return undefined;
+  if (icon === "email") return `mailto:${v}`;
+  if (icon === "phone") return `tel:${v.replace(/[^\d+]/g, "")}`;
+  if (icon === "website") return v.startsWith("http") ? v : `https://${v}`;
+  return undefined; // location stays plain text
+}
+
+function Contact({ block }: { block: ContactBlock }) {
+  const items = block.items?.filter((i) => i.value.trim().length > 0) ?? [];
+  return (
+    <section className="mx-auto max-w-4xl px-6 py-12 sm:py-16">
+      {block.heading && <SectionHeading title={block.heading} />}
+      {block.intro && (
+        <p className="mb-8 max-w-2xl leading-relaxed text-muted">
+          {block.intro}
+        </p>
+      )}
+      <ul className="space-y-5">
+        {items.map((item) => {
+          const Icon = contactIconMap[item.icon];
+          const href = contactHref(item.icon, item.value);
+          return (
+            <li key={item.id} className="flex items-center gap-4">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
+                <Icon size={20} />
+              </span>
+              <div>
+                {item.label && (
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted">
+                    {item.label}
+                  </p>
+                )}
+                {href ? (
+                  <a
+                    href={href}
+                    className="text-base font-medium transition hover:text-accent"
+                  >
+                    {item.value}
+                  </a>
+                ) : (
+                  <p className="text-base font-medium">{item.value}</p>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }
@@ -560,6 +624,8 @@ function renderBlock(block: Block, settings?: SiteSettings) {
       return <Timeline block={block} />;
     case "bullet_list":
       return <BulletList block={block} />;
+    case "contact":
+      return <Contact block={block} />;
     case "profile":
       return <Profile block={block} settings={settings} />;
     case "video_embed":
