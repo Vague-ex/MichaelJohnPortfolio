@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { SiteSettings } from "@/lib/types";
 import type { NavItem } from "@/components/public/SiteHeader";
 import SocialIcon, { type SocialName } from "@/components/public/SocialIcon";
@@ -41,13 +40,13 @@ export default function SiteFooter({
           {navItems.length > 0 && (
             <nav className="flex flex-col gap-2 text-sm">
               {navItems.map((item) => (
-                <Link
+                <a
                   key={item.href}
                   href={item.href}
                   className="text-muted transition hover:text-accent"
                 >
                   {item.title}
-                </Link>
+                </a>
               ))}
             </nav>
           )}

@@ -55,6 +55,33 @@ function AlignField({
   );
 }
 
+/** Year + description fields for a gallery/album image (shown in the preview). */
+function ImageMeta({
+  value,
+  onChange,
+}: {
+  value: ImageRef;
+  onChange: (image: ImageRef) => void;
+}) {
+  if (!value.url) return null;
+  return (
+    <div className="mt-2 space-y-1.5">
+      <input
+        className={inputClass}
+        placeholder="Year / date (e.g. 2016)"
+        value={value.date ?? ""}
+        onChange={(e) => onChange({ ...value, date: e.target.value })}
+      />
+      <textarea
+        className={`${inputClass} min-h-16`}
+        placeholder="Description (shown beside the image in the preview)"
+        value={value.description ?? ""}
+        onChange={(e) => onChange({ ...value, description: e.target.value })}
+      />
+    </div>
+  );
+}
+
 export default function BlockEditor({
   block,
   onChange,
@@ -246,6 +273,7 @@ export default function BlockEditor({
                   showCaption
                   onChange={(next) => updateImage(i, next)}
                 />
+                <ImageMeta value={img} onChange={(next) => updateImage(i, next)} />
               </div>
             ))}
           </div>
@@ -457,6 +485,10 @@ export default function BlockEditor({
                     <ImageInput
                       value={img}
                       showCaption
+                      onChange={(next) => updateImage(ai, ii, next)}
+                    />
+                    <ImageMeta
+                      value={img}
                       onChange={(next) => updateImage(ai, ii, next)}
                     />
                   </div>

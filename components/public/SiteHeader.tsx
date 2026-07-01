@@ -1,30 +1,44 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export interface NavItem {
   title: string;
-  href: string;
+  href: string; // in-page anchor, e.g. "#about"
 }
 
 export default function SiteHeader({
   siteTitle,
   items,
   contactEmail,
+  resumeUrl,
 }: {
   siteTitle: string;
   items: NavItem[];
   contactEmail?: string;
+  resumeUrl?: string;
 }) {
   const [open, setOpen] = useState(false);
-  const pathname = usePathname();
+  const [active, setActive] = useState<string>("");
 
-  const hasContact = items.some((i) => i.href === "/contact");
+  // Scroll-spy: highlight the nav item for the section currently in view.
+  useEffect(() => {
+    const ids = items.map((i) => i.href.replace("#", ""));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActive(entry.target.id);
+        });
+      },
+      { rootMargin: "-40% 0px -55% 0px", threshold: 0 },
+    );
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, [items]);
 
-  // "Hire me" opens a pre-filled Gmail compose window when an email is set,
-  // otherwise falls back to the contact page.
   const gmailHref = contactEmail
     ? `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
         contactEmail,
@@ -34,41 +48,50 @@ export default function SiteHeader({
         `Hi ${siteTitle},\n\nI came across your portfolio and I'd love to work with you on a project.\n\nHere are a few details:\n- What I need: \n- Timeline: \n- Budget: \n\nThanks!`,
       )}`
     : null;
-  const hireHref = gmailHref ?? (hasContact ? "/contact" : null);
 
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-background/85 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link
-          href="/"
+        <a
+          href="#home"
           className="font-display text-lg font-semibold tracking-tight transition hover:text-accent"
         >
           {siteTitle}
-        </Link>
+        </a>
 
         <div className="flex items-center gap-6">
           <nav className="hidden gap-6 text-sm sm:flex">
             {items.map((item) => (
-              <Link
+              <a
                 key={item.href}
                 href={item.href}
                 className={
-                  pathname === item.href
+                  active === item.href.replace("#", "")
                     ? "font-medium text-accent"
                     : "text-muted transition hover:text-foreground"
                 }
               >
                 {item.title}
-              </Link>
+              </a>
             ))}
           </nav>
 
-          {hireHref && (
+          {resumeUrl && (
             <a
-              href={hireHref}
-              {...(gmailHref
-                ? { target: "_blank", rel: "noopener noreferrer" }
-                : {})}
+              href={resumeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden rounded-full border border-foreground/20 px-5 py-2 text-sm font-medium transition hover:border-foreground sm:inline-block"
+            >
+              Résumé
+            </a>
+          )}
+
+          {gmailHref && (
+            <a
+              href={gmailHref}
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn-shine hidden rounded-full bg-accent px-6 py-2 text-sm font-medium text-white shadow-sm transition duration-300 hover:-translate-y-0.5 hover:bg-accent-dark hover:shadow-[0_8px_24px_rgba(224,97,58,0.45)] sm:inline-block"
             >
               Hire me
@@ -90,15 +113,26 @@ export default function SiteHeader({
       {open && (
         <nav className="flex flex-col gap-1 border-t border-line px-6 py-3 sm:hidden">
           {items.map((item) => (
-            <Link
+            <a
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
               className="py-1 text-sm text-foreground"
             >
               {item.title}
-            </Link>
+            </a>
           ))}
+          {resumeUrl && (
+            <a
+              href={resumeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpen(false)}
+              className="py-1 text-sm font-medium text-accent"
+            >
+              Résumé
+            </a>
+          )}
         </nav>
       )}
     </header>

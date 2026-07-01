@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import type { Album, ImageAlbumBlock, ImageRef } from "@/lib/types";
+import type { Album, ImageAlbumBlock } from "@/lib/types";
+import Lightbox from "@/components/blocks/Lightbox";
 
 function ImageCountIcon() {
   return (
@@ -23,13 +24,7 @@ function ImageCountIcon() {
   );
 }
 
-function AlbumCard({
-  album,
-  onOpen,
-}: {
-  album: Album;
-  onOpen: () => void;
-}) {
+function AlbumCard({ album, onOpen }: { album: Album; onOpen: () => void }) {
   const cover = album.cover?.url ? album.cover : album.images[0];
   const thumbs = (album.cover?.url ? album.images : album.images.slice(1)).slice(
     0,
@@ -108,150 +103,9 @@ function AlbumCard({
   );
 }
 
-function Lightbox({
-  album,
-  index,
-  setIndex,
-  onClose,
-}: {
-  album: Album;
-  index: number;
-  setIndex: (updater: (i: number) => number) => void;
-  onClose: () => void;
-}) {
-  const total = album.images.length;
-  const next = useCallback(
-    () => setIndex((i) => (i + 1) % total),
-    [setIndex, total],
-  );
-  const prev = useCallback(
-    () => setIndex((i) => (i - 1 + total) % total),
-    [setIndex, total],
-  );
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "ArrowRight") next();
-      if (e.key === "ArrowLeft") prev();
-    };
-    window.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
-  }, [onClose, next, prev]);
-
-  const img: ImageRef | undefined = album.images[index];
-  if (!img) return null;
-  const title = img.caption || img.alt || album.title;
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex flex-col bg-black/90 p-4 sm:p-6"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-    >
-      <div className="flex items-center justify-between text-white">
-        <span className="text-sm font-medium">{album.title}</span>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close"
-          className="rounded-full px-3 py-1 text-sm hover:bg-white/15"
-        >
-          ✕ Close
-        </button>
-      </div>
-
-      <div
-        className="relative flex flex-1 items-center justify-center"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {total > 1 && (
-          <button
-            type="button"
-            onClick={prev}
-            aria-label="Previous image"
-            className="absolute left-0 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-2xl text-white transition hover:bg-white/25"
-          >
-            ‹
-          </button>
-        )}
-
-        <div className="relative h-full max-h-[68vh] w-full max-w-4xl">
-          <Image
-            src={img.url}
-            alt={img.alt ?? title}
-            fill
-            sizes="100vw"
-            className="object-contain"
-            priority
-          />
-        </div>
-
-        {total > 1 && (
-          <button
-            type="button"
-            onClick={next}
-            aria-label="Next image"
-            className="absolute right-0 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-2xl text-white transition hover:bg-white/25"
-          >
-            ›
-          </button>
-        )}
-      </div>
-
-      <div
-        className="space-y-3 text-center text-white"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div>
-          <p className="text-base font-medium">{title}</p>
-          <p className="text-xs text-white/60">
-            {index + 1} / {total}
-          </p>
-        </div>
-
-        {total > 1 && (
-          <div className="flex justify-center gap-2 overflow-x-auto pb-1">
-            {album.images.map((t, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setIndex(() => i)}
-                aria-label={`Go to image ${i + 1}`}
-                className={`relative h-12 w-12 shrink-0 overflow-hidden rounded-md ring-2 transition ${
-                  i === index ? "ring-accent" : "ring-transparent opacity-60"
-                }`}
-              >
-                <Image
-                  src={t.url}
-                  alt={t.alt ?? ""}
-                  fill
-                  sizes="48px"
-                  className="object-cover"
-                />
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 export default function ImageAlbum({ block }: { block: ImageAlbumBlock }) {
   const [openAlbum, setOpenAlbum] = useState<number | null>(null);
-  const [imageIndex, setImageIndex] = useState(0);
   const albums = block.albums ?? [];
-
-  const open = (i: number) => {
-    setImageIndex(0);
-    setOpenAlbum(i);
-  };
 
   if (albums.length === 0) return null;
 
@@ -266,15 +120,14 @@ export default function ImageAlbum({ block }: { block: ImageAlbumBlock }) {
 
       <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {albums.map((album, i) => (
-          <AlbumCard key={album.id} album={album} onOpen={() => open(i)} />
+          <AlbumCard key={album.id} album={album} onOpen={() => setOpenAlbum(i)} />
         ))}
       </div>
 
       {openAlbum !== null && albums[openAlbum] && (
         <Lightbox
-          album={albums[openAlbum]}
-          index={imageIndex}
-          setIndex={setImageIndex}
+          images={albums[openAlbum].images}
+          contextTitle={albums[openAlbum].title}
           onClose={() => setOpenAlbum(null)}
         />
       )}

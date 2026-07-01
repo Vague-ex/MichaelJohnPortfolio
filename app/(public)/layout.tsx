@@ -18,6 +18,7 @@ export default async function PublicLayout({
         siteTitle={settings.site_title}
         items={navItems}
         contactEmail={settings.socials?.email}
+        resumeUrl={settings.socials?.resume}
       />
       <div className="flex-1">{children}</div>
       <SiteFooter settings={settings} navItems={navItems} />

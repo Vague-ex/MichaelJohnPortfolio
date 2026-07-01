@@ -6,7 +6,6 @@ import type {
   ColumnsBlock,
   ContactBlock,
   ContactIcon,
-  GalleryBlock,
   HeroBlock,
   ImageBlock,
   ImageRef,
@@ -21,6 +20,7 @@ import { getEmbedUrl } from "@/lib/blocks";
 import Reveal from "@/components/public/Reveal";
 import SocialIcon, { type SocialName } from "@/components/public/SocialIcon";
 import ImageAlbum from "@/components/blocks/ImageAlbum";
+import Gallery from "@/components/blocks/Gallery";
 
 const alignClass: Record<TextAlign, string> = {
   left: "text-left",
@@ -266,42 +266,6 @@ function SingleImage({ block }: { block: ImageBlock }) {
   );
 }
 
-function Gallery({ block }: { block: GalleryBlock }) {
-  const cols = gridColsClass[block.columns] ?? gridColsClass[3];
-  const images = block.images.filter((img) => img.url);
-  if (images.length === 0 && !block.heading) return null;
-  return (
-    <section className="mx-auto max-w-6xl px-6 py-12 sm:py-16">
-      {block.heading && <SectionHeading title={block.heading} />}
-      <div className={`grid grid-cols-1 gap-5 ${cols}`}>
-        {images.map((img, i) => (
-          <figure
-            key={i}
-            className="group relative overflow-hidden rounded-xl bg-card shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
-          >
-            <div className="relative aspect-square w-full overflow-hidden">
-              <Image
-                src={img.url}
-                alt={img.alt ?? ""}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                className="object-cover transition duration-500 group-hover:scale-105"
-              />
-            </div>
-            {img.caption && (
-              <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end bg-gradient-to-t from-black/65 to-transparent p-4 opacity-0 transition duration-300 group-hover:opacity-100">
-                <span className="text-sm font-medium text-white">
-                  {img.caption}
-                </span>
-              </figcaption>
-            )}
-          </figure>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function Columns({ block }: { block: ColumnsBlock }) {
   const count = Math.min(Math.max(block.columns.length, 1), 6);
   const cols = gridColsClass[count] ?? gridColsClass[3];
@@ -462,11 +426,24 @@ function Timeline({ block }: { block: TimelineBlock }) {
                   {e.time}
                 </time>
               )}
-              {e.description && (
-                <p className="mt-2 leading-relaxed text-muted">
-                  {e.description}
-                </p>
-              )}
+              {e.description &&
+                (e.description.includes("\n") ? (
+                  <ul className="mt-2 space-y-1 text-muted">
+                    {e.description
+                      .split("\n")
+                      .filter((line) => line.trim().length > 0)
+                      .map((line, li) => (
+                        <li key={li} className="flex gap-2 leading-relaxed">
+                          <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-accent" />
+                          <span>{line}</span>
+                        </li>
+                      ))}
+                  </ul>
+                ) : (
+                  <p className="mt-2 leading-relaxed text-muted">
+                    {e.description}
+                  </p>
+                ))}
             </div>
           ))}
         </div>

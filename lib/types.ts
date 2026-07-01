@@ -10,7 +10,9 @@
 export interface ImageRef {
   url: string;
   alt?: string;
-  caption?: string;
+  caption?: string; // used as the title in the image preview
+  date?: string; // e.g. "2016" — when the piece was made
+  description?: string; // shown in the preview's info panel
   width?: number;
   height?: number;
 }
@@ -188,6 +190,7 @@ export interface SocialLinks {
   facebook?: string;
   instagram?: string;
   email?: string;
+  resume?: string; // public URL to the résumé PDF
   [key: string]: string | undefined;
 }
 

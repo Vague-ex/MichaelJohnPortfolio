@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import BlockRenderer from "@/components/blocks/BlockRenderer";
-import { getPageBySlug, getSiteSettings } from "@/lib/data";
+import { getPublishedPages, getSiteSettings } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
@@ -18,12 +18,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const [page, settings] = await Promise.all([
-    getPageBySlug("home"),
+  const [pages, settings] = await Promise.all([
+    getPublishedPages(),
     getSiteSettings(),
   ]);
 
-  if (!page) {
+  if (pages.length === 0) {
     return (
       <main className="mx-auto max-w-2xl px-6 py-24 text-center text-muted">
         <p>This portfolio is being set up. Please check back soon.</p>
@@ -31,9 +31,14 @@ export default async function HomePage() {
     );
   }
 
+  // Single scrolling page: every published page becomes an anchored section.
   return (
     <main>
-      <BlockRenderer blocks={page.content ?? []} settings={settings} />
+      {pages.map((page) => (
+        <section key={page.id} id={page.slug} className="scroll-mt-20">
+          <BlockRenderer blocks={page.content ?? []} settings={settings} />
+        </section>
+      ))}
     </main>
   );
 }

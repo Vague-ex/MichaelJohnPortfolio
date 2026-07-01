@@ -20,7 +20,21 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   return (data as SiteSettings) ?? FALLBACK_SETTINGS;
 }
 
-/** Published pages that opt into the menu, ordered for the nav bar. */
+/** All published pages, in order — rendered as sections on the single-page site. */
+export async function getPublishedPages(): Promise<Page[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("pages")
+    .select("id, slug, title, nav_order, published, show_in_nav, content, updated_at")
+    .eq("published", true)
+    .order("nav_order", { ascending: true });
+  return (data as Page[]) ?? [];
+}
+
+/**
+ * Published pages that opt into the menu. Hrefs are in-page anchors (`#slug`)
+ * because the public site is a single scrolling page.
+ */
 export async function getNavItems(): Promise<NavItem[]> {
   const supabase = await createClient();
   const { data } = await supabase
@@ -32,7 +46,7 @@ export async function getNavItems(): Promise<NavItem[]> {
 
   return (data ?? []).map((p) => ({
     title: p.title,
-    href: p.slug === "home" ? "/" : `/${p.slug}`,
+    href: `#${p.slug}`,
   }));
 }
 
