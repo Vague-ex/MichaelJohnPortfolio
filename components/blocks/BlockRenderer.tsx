@@ -201,69 +201,66 @@ function Hero({ block }: { block: HeroBlock }) {
 
   if (hasImage) {
     return (
-      <section className="relative isolate overflow-hidden bg-neutral-950 text-white">
-        <div className="mx-auto grid max-w-7xl items-stretch md:grid-cols-[42fr_58fr]">
-          {/* Text (solid left half so nothing wraps awkwardly) */}
-          <div className="flex flex-col justify-center gap-6 px-6 py-16 md:min-h-[86vh] md:py-24 md:pl-10 md:pr-8">
-            {block.badgeText && (
+      <section className="relative isolate min-h-[85vh] overflow-hidden bg-neutral-950 text-white">
+        {/* Photo: full-bleed background on mobile, diagonal right side on desktop */}
+        <div className="absolute inset-0 md:left-[40%]">
+          <div className="relative h-full w-full md:[clip-path:polygon(16%_0,100%_0,100%_100%,0%_100%)]">
+            <Image
+              src={block.image!.url}
+              alt={block.image!.alt ?? block.heading}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
+          </div>
+          {/* Darken for text readability: bottom-up on mobile, left-to-right on desktop */}
+          <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/55 to-neutral-950/20 md:bg-gradient-to-r md:from-neutral-950 md:via-neutral-950/15 md:to-transparent" />
+        </div>
+
+        {/* Text */}
+        <div className="relative z-10 mx-auto flex min-h-[85vh] max-w-7xl flex-col justify-center gap-6 px-6 py-20 md:py-24 md:pr-[56%]">
+          {block.badgeText && (
+            <a
+              href={block.badgeUrl || undefined}
+              className="inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-sm text-white/80 transition hover:border-white/30"
+            >
+              <span>{block.badgeText}</span>
+              {block.badgeUrl && (
+                <span className="font-medium text-accent">Read more →</span>
+              )}
+            </a>
+          )}
+          {block.eyebrow && (
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">
+              {block.eyebrow}
+            </p>
+          )}
+          <h1 className={`${hSize} font-semibold leading-[1.05] tracking-tight`}>
+            {block.heading}
+          </h1>
+          {block.subheading && (
+            <p className="max-w-md text-lg text-white/80 sm:text-xl">
+              {renderInline(block.subheading)}
+            </p>
+          )}
+          <div className="flex flex-wrap gap-3 pt-2">
+            {block.ctaText && block.ctaUrl && (
               <a
-                href={block.badgeUrl || undefined}
-                className="inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-sm text-white/80 transition hover:border-white/30"
+                href={block.ctaUrl}
+                className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-white transition hover:bg-accent-dark"
               >
-                <span>{block.badgeText}</span>
-                {block.badgeUrl && (
-                  <span className="font-medium text-accent">Read more →</span>
-                )}
+                {block.ctaText}
               </a>
             )}
-            {block.eyebrow && (
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">
-                {block.eyebrow}
-              </p>
+            {block.cta2Text && block.cta2Url && (
+              <a
+                href={block.cta2Url}
+                className="rounded-full border border-white/25 px-6 py-3 text-sm font-medium text-white transition hover:border-white/60"
+              >
+                {block.cta2Text}
+              </a>
             )}
-            <h1
-              className={`${hSize} font-semibold leading-[1.05] tracking-tight`}
-            >
-              {block.heading}
-            </h1>
-            {block.subheading && (
-              <p className="max-w-md text-lg text-white/70 sm:text-xl">
-                {renderInline(block.subheading)}
-              </p>
-            )}
-            <div className="flex flex-wrap gap-3 pt-2">
-              {block.ctaText && block.ctaUrl && (
-                <a
-                  href={block.ctaUrl}
-                  className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-white transition hover:bg-accent-dark"
-                >
-                  {block.ctaText}
-                </a>
-              )}
-              {block.cta2Text && block.cta2Url && (
-                <a
-                  href={block.cta2Url}
-                  className="rounded-full border border-white/25 px-6 py-3 text-sm font-medium text-white transition hover:border-white/60"
-                >
-                  {block.cta2Text}
-                </a>
-              )}
-            </div>
-          </div>
-
-          {/* Photo: below the text on mobile, diagonal right half on desktop */}
-          <div className="relative h-72 w-full sm:h-96 md:h-auto">
-            <div className="relative h-full w-full md:[clip-path:polygon(14%_0,100%_0,100%_100%,0%_100%)]">
-              <Image
-                src={block.image!.url}
-                alt={block.image!.alt ?? block.heading}
-                fill
-                priority
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover"
-              />
-              <div className="absolute inset-0 hidden bg-gradient-to-r from-neutral-950 via-transparent to-transparent md:block" />
-            </div>
           </div>
         </div>
       </section>
