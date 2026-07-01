@@ -202,7 +202,7 @@ function Hero({ block }: { block: HeroBlock }) {
   if (hasImage) {
     return (
       <section className="relative isolate overflow-hidden bg-neutral-950 text-white">
-        <div className="mx-auto grid max-w-7xl items-stretch md:grid-cols-2">
+        <div className="mx-auto grid max-w-7xl items-stretch md:grid-cols-[42fr_58fr]">
           {/* Text (solid left half so nothing wraps awkwardly) */}
           <div className="flex flex-col justify-center gap-6 px-6 py-16 md:min-h-[86vh] md:py-24 md:pl-10 md:pr-8">
             {block.badgeText && (
