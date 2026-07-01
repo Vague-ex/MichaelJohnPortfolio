@@ -50,6 +50,7 @@ function AlignField({
         <option value="left">Left</option>
         <option value="center">Center</option>
         <option value="right">Right</option>
+        <option value="justify">Justify</option>
       </select>
     </Field>
   );
@@ -93,6 +94,26 @@ export default function BlockEditor({
     case "hero":
       return (
         <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field label="Badge / pill text (optional)">
+              <input
+                className={inputClass}
+                placeholder="e.g. New mural project in Bacolod"
+                value={block.badgeText ?? ""}
+                onChange={(e) =>
+                  onChange({ ...block, badgeText: e.target.value })
+                }
+              />
+            </Field>
+            <Field label="Badge link (optional)">
+              <input
+                className={inputClass}
+                placeholder="#work or https://…"
+                value={block.badgeUrl ?? ""}
+                onChange={(e) => onChange({ ...block, badgeUrl: e.target.value })}
+              />
+            </Field>
+          </div>
           <Field label="Eyebrow (small label above heading)">
             <input
               className={inputClass}
@@ -437,13 +458,23 @@ export default function BlockEditor({
                 </div>
               </div>
 
-              <Field label="Album title">
-                <input
-                  className={inputClass}
-                  value={album.title}
-                  onChange={(e) => updateAlbum(ai, { title: e.target.value })}
-                />
-              </Field>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <Field label="Album title">
+                  <input
+                    className={inputClass}
+                    value={album.title}
+                    onChange={(e) => updateAlbum(ai, { title: e.target.value })}
+                  />
+                </Field>
+                <Field label="Date (shown on the card)">
+                  <input
+                    className={inputClass}
+                    placeholder="e.g. 2016 or 2015 - 2019"
+                    value={album.date ?? ""}
+                    onChange={(e) => updateAlbum(ai, { date: e.target.value })}
+                  />
+                </Field>
+              </div>
 
               <Field label="Cover image (optional, defaults to first image)">
                 <ImageInput

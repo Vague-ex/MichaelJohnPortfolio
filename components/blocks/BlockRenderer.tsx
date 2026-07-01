@@ -26,6 +26,7 @@ const alignClass: Record<TextAlign, string> = {
   left: "text-left",
   center: "text-center",
   right: "text-right",
+  justify: "text-justify",
 };
 
 const gridColsClass: Record<number, string> = {
@@ -168,39 +169,63 @@ function Hero({ block }: { block: HeroBlock }) {
 
   if (hasImage) {
     return (
-      <section className="relative overflow-hidden bg-gradient-to-br from-accent-soft via-background to-background">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-16 sm:py-20 md:grid-cols-2">
-          <div className="space-y-5">
-            {block.eyebrow && <Eyebrow>{block.eyebrow}</Eyebrow>}
-            <h1 className="text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
-              {block.heading}
-            </h1>
-            <span className="block h-1 w-16 rounded-full bg-accent" />
-            {block.subheading && (
-              <p className="max-w-md text-lg text-muted">{block.subheading}</p>
-            )}
-            <CtaButtons
-              primary={block.ctaText}
-              primaryUrl={block.ctaUrl}
-              secondary={block.cta2Text}
-              secondaryUrl={block.cta2Url}
+      <section className="relative isolate overflow-hidden bg-neutral-950 text-white">
+        {/* Photo: on top for mobile, diagonal right panel on desktop. */}
+        <div className="relative h-72 w-full sm:h-96 md:absolute md:inset-y-0 md:right-0 md:h-full md:w-[52%]">
+          <div className="relative h-full w-full md:[clip-path:polygon(18%_0,100%_0,100%_100%,0%_100%)]">
+            <Image
+              src={block.image!.url}
+              alt={block.image!.alt ?? block.heading}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 55vw"
+              className="object-cover"
             />
+            <div className="absolute inset-0 hidden bg-gradient-to-r from-neutral-950 via-neutral-950/20 to-transparent md:block" />
           </div>
-          <div className="relative mx-auto w-full max-w-sm">
-            {/* Coral accent block + a soft dark base so a dark/black-background
-                portrait reads as an intentional framed photo on the light page. */}
-            <div className="absolute -right-4 -top-4 h-full w-full rounded-[2rem] bg-accent/20" />
-            <div className="absolute -bottom-3 -left-3 h-2/3 w-2/3 rounded-[2rem] bg-foreground/5" />
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-neutral-900 shadow-2xl ring-1 ring-black/10">
-              <Image
-                src={block.image!.url}
-                alt={block.image!.alt ?? block.heading}
-                fill
-                priority
-                sizes="(max-width: 768px) 90vw, 420px"
-                className="object-cover"
-              />
-            </div>
+        </div>
+
+        {/* Text */}
+        <div className="relative mx-auto flex max-w-6xl flex-col justify-center gap-6 px-6 py-14 md:min-h-[86vh] md:py-24 md:pr-[54%]">
+          {block.badgeText && (
+            <a
+              href={block.badgeUrl || undefined}
+              className="inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-sm text-white/80 transition hover:border-white/30"
+            >
+              <span>{block.badgeText}</span>
+              {block.badgeUrl && (
+                <span className="font-medium text-accent">Read more →</span>
+              )}
+            </a>
+          )}
+          {block.eyebrow && (
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">
+              {block.eyebrow}
+            </p>
+          )}
+          <h1 className="text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
+            {block.heading}
+          </h1>
+          {block.subheading && (
+            <p className="max-w-xl text-lg text-white/70">{block.subheading}</p>
+          )}
+          <div className="flex flex-wrap gap-3 pt-2">
+            {block.ctaText && block.ctaUrl && (
+              <a
+                href={block.ctaUrl}
+                className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-white transition hover:bg-accent-dark"
+              >
+                {block.ctaText}
+              </a>
+            )}
+            {block.cta2Text && block.cta2Url && (
+              <a
+                href={block.cta2Url}
+                className="rounded-full border border-white/25 px-6 py-3 text-sm font-medium text-white transition hover:border-white/60"
+              >
+                {block.cta2Text}
+              </a>
+            )}
           </div>
         </div>
       </section>
@@ -217,7 +242,7 @@ function Hero({ block }: { block: HeroBlock }) {
         } ${align === "center" ? "items-center" : ""}`}
       >
         {block.eyebrow && <Eyebrow>{block.eyebrow}</Eyebrow>}
-        <h1 className="text-5xl font-semibold leading-tight sm:text-6xl">
+        <h1 className="text-5xl font-semibold leading-tight sm:text-6xl lg:text-7xl">
           {block.heading}
         </h1>
         <span className="block h-1 w-16 rounded-full bg-accent" />

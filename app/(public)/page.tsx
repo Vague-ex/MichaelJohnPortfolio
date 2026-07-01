@@ -31,11 +31,16 @@ export default async function HomePage() {
     );
   }
 
-  // Single scrolling page: every published page becomes an anchored section.
+  // Single scrolling page: every published page becomes an anchored section,
+  // with alternating backgrounds for visual rhythm on wide screens.
   return (
     <main>
-      {pages.map((page) => (
-        <section key={page.id} id={page.slug} className="scroll-mt-20">
+      {pages.map((page, i) => (
+        <section
+          key={page.id}
+          id={page.slug}
+          className={`scroll-mt-20 ${i % 2 === 1 ? "bg-surface" : ""}`}
+        >
           <BlockRenderer blocks={page.content ?? []} settings={settings} />
         </section>
       ))}

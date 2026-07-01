@@ -2,11 +2,18 @@
 
 import { useState, useTransition } from "react";
 import BlockEditor from "@/components/admin/BlockEditor";
+import BlockRenderer from "@/components/blocks/BlockRenderer";
 import { BLOCK_META, BLOCK_ORDER, createBlock } from "@/lib/blocks";
 import { savePage } from "@/lib/actions/pages";
-import type { Block, BlockType, Page } from "@/lib/types";
+import type { Block, BlockType, Page, SiteSettings } from "@/lib/types";
 
-export default function PageEditorForm({ page }: { page: Page }) {
+export default function PageEditorForm({
+  page,
+  settings,
+}: {
+  page: Page;
+  settings: SiteSettings;
+}) {
   const [title, setTitle] = useState(page.title);
   const [slug, setSlug] = useState(page.slug);
   const [published, setPublished] = useState(page.published);
@@ -15,6 +22,7 @@ export default function PageEditorForm({ page }: { page: Page }) {
   const [blocks, setBlocks] = useState<Block[]>(page.content ?? []);
   const [addOpen, setAddOpen] = useState(false);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [mode, setMode] = useState<"edit" | "preview">("edit");
 
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<{
@@ -70,6 +78,49 @@ export default function PageEditorForm({ page }: { page: Page }) {
 
   return (
     <div className="space-y-6">
+      {/* Edit / Preview toggle */}
+      <div className="flex items-center justify-between">
+        <div className="inline-flex rounded-lg border border-neutral-300 p-0.5 text-sm font-medium">
+          <button
+            type="button"
+            onClick={() => setMode("edit")}
+            className={`rounded-md px-4 py-1.5 ${
+              mode === "edit" ? "bg-neutral-900 text-white" : "text-neutral-600"
+            }`}
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("preview")}
+            className={`rounded-md px-4 py-1.5 ${
+              mode === "preview"
+                ? "bg-neutral-900 text-white"
+                : "text-neutral-600"
+            }`}
+          >
+            Preview
+          </button>
+        </div>
+        {mode === "preview" && (
+          <span className="text-xs text-neutral-500">
+            Live preview of your unsaved changes
+          </span>
+        )}
+      </div>
+
+      {mode === "preview" ? (
+        <div className="overflow-hidden rounded-xl border border-neutral-200 bg-background text-foreground">
+          {blocks.length === 0 ? (
+            <p className="p-10 text-center text-sm text-muted">
+              No blocks yet. Switch to Edit and add some.
+            </p>
+          ) : (
+            <BlockRenderer blocks={blocks} settings={settings} />
+          )}
+        </div>
+      ) : (
+        <>
       {/* Page settings */}
       <div className="space-y-4 rounded-xl border border-neutral-200 bg-white p-5">
         <h2 className="text-lg font-semibold">Page settings</h2>
@@ -223,6 +274,8 @@ export default function PageEditorForm({ page }: { page: Page }) {
           )}
         </div>
       </div>
+        </>
+      )}
 
       {/* Save bar */}
       <div className="sticky bottom-0 flex items-center justify-between gap-4 rounded-xl border border-neutral-200 bg-white/95 p-4 shadow-lg backdrop-blur">

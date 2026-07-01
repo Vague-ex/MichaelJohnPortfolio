@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getSiteSettings } from "@/lib/data";
 import PageEditorForm from "@/components/admin/PageEditorForm";
 import type { Page } from "@/lib/types";
 
@@ -13,11 +14,14 @@ export default async function EditPage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("pages")
-    .select("id, slug, title, nav_order, published, show_in_nav, content, updated_at")
-    .eq("id", id)
-    .single();
+  const [{ data }, settings] = await Promise.all([
+    supabase
+      .from("pages")
+      .select("id, slug, title, nav_order, published, show_in_nav, content, updated_at")
+      .eq("id", id)
+      .single(),
+    getSiteSettings(),
+  ]);
 
   if (!data) notFound();
   const page = data as Page;
@@ -27,7 +31,7 @@ export default async function EditPage({
       <Link href="/admin" className="text-sm text-neutral-500 hover:text-neutral-900">
         ← Back to pages
       </Link>
-      <PageEditorForm page={page} />
+      <PageEditorForm page={page} settings={settings} />
     </div>
   );
 }

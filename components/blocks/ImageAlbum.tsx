@@ -90,11 +90,18 @@ function AlbumCard({ album, onOpen }: { album: Album; onOpen: () => void }) {
         );
       })}
 
-      <div className="col-span-3 flex items-center justify-between pt-1">
-        <h3 className="text-lg font-semibold transition group-hover:text-accent">
-          {album.title}
-        </h3>
-        <span className="flex items-center gap-1 text-xs font-medium text-muted">
+      <div className="col-span-3 flex items-start justify-between pt-1">
+        <div>
+          <h3 className="text-lg font-semibold transition group-hover:text-accent">
+            {album.title}
+          </h3>
+          {album.date && (
+            <p className="text-xs font-medium uppercase tracking-wide text-muted">
+              {album.date}
+            </p>
+          )}
+        </div>
+        <span className="flex shrink-0 items-center gap-1 text-xs font-medium text-muted">
           <ImageCountIcon />
           {count}
         </span>

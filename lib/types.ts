@@ -17,7 +17,7 @@ export interface ImageRef {
   height?: number;
 }
 
-export type TextAlign = "left" | "center" | "right";
+export type TextAlign = "left" | "center" | "right" | "justify";
 
 export interface HeroBlock {
   id: string;
@@ -27,6 +27,8 @@ export interface HeroBlock {
   subheading?: string;
   image?: ImageRef;
   align?: TextAlign;
+  badgeText?: string; // small pill above the heading
+  badgeUrl?: string;
   ctaText?: string;
   ctaUrl?: string;
   cta2Text?: string;
@@ -99,6 +101,7 @@ export interface ContactBlock {
 export interface Album {
   id: string;
   title: string;
+  date?: string; // shown on the album card, e.g. "2016" or "2015 - 2019"
   cover?: ImageRef;
   images: ImageRef[]; // each image's `caption` is its title in the viewer
 }

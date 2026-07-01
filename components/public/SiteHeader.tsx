@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ThemeToggle from "@/components/public/ThemeToggle";
 
 export interface NavItem {
   title: string;
@@ -75,6 +76,8 @@ export default function SiteHeader({
               </a>
             ))}
           </nav>
+
+          <ThemeToggle />
 
           {resumeUrl && (
             <a

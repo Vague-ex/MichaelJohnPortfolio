@@ -13,6 +13,18 @@
   --accent-soft: #f7ddd2; /* tint for panels/blobs */
 }
 
+.dark {
+  --background: #14110e; /* warm near-black */
+  --surface: #1d1815;
+  --foreground: #f3ede5;
+  --muted: #a89f95;
+  --card: #221d18;
+  --line: #342d26;
+  --accent: #ef7a52; /* brighter coral for dark bg */
+  --accent-dark: #e0613a;
+  --accent-soft: #2a201b;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
