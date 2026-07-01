@@ -11,7 +11,7 @@ export default async function SettingsPage() {
       <div>
         <h1 className="text-2xl font-semibold">Site settings</h1>
         <p className="text-sm text-neutral-500">
-          Your name, tagline, and the links shown in the footer.
+          Your name, tagline, and the links shown in the footer. lol feet
         </p>
       </div>
       <SettingsForm settings={settings} />

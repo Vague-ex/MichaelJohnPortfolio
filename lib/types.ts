@@ -19,11 +19,15 @@ export interface ImageRef {
 
 export type TextAlign = "left" | "center" | "right" | "justify";
 
+export type HeadingSize = "md" | "lg" | "xl";
+export type TextSize = "sm" | "base" | "lg";
+
 export interface HeroBlock {
   id: string;
   type: "hero";
   eyebrow?: string;
   heading: string;
+  headingSize?: HeadingSize;
   subheading?: string;
   image?: ImageRef;
   align?: TextAlign;
@@ -39,8 +43,9 @@ export interface RichTextBlock {
   id: string;
   type: "rich_text";
   heading?: string;
-  text: string; // plain text; blank lines become paragraphs
+  text: string; // supports **bold** and *italic*; blank lines become paragraphs
   align?: TextAlign;
+  size?: TextSize;
 }
 
 export interface ImageBlock {

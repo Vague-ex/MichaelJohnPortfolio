@@ -9,9 +9,11 @@ import type {
   ColumnItem,
   ContactIcon,
   ContactItem,
+  HeadingSize,
   ImageRef,
   ProfileDetail,
   TextAlign,
+  TextSize,
   TimelineEntry,
 } from "@/lib/types";
 
@@ -122,13 +124,31 @@ export default function BlockEditor({
               onChange={(e) => onChange({ ...block, eyebrow: e.target.value })}
             />
           </Field>
-          <Field label="Heading">
-            <input
-              className={inputClass}
-              value={block.heading}
-              onChange={(e) => onChange({ ...block, heading: e.target.value })}
-            />
-          </Field>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field label="Heading">
+              <input
+                className={inputClass}
+                value={block.heading}
+                onChange={(e) => onChange({ ...block, heading: e.target.value })}
+              />
+            </Field>
+            <Field label="Heading size">
+              <select
+                className={inputClass}
+                value={block.headingSize ?? "xl"}
+                onChange={(e) =>
+                  onChange({
+                    ...block,
+                    headingSize: e.target.value as HeadingSize,
+                  })
+                }
+              >
+                <option value="md">Small</option>
+                <option value="lg">Medium</option>
+                <option value="xl">Large</option>
+              </select>
+            </Field>
+          </div>
           <Field label="Subheading">
             <input
               className={inputClass}
@@ -138,6 +158,10 @@ export default function BlockEditor({
               }
             />
           </Field>
+          <p className="text-xs text-neutral-500">
+            Tip: wrap words in **double asterisks** for <strong>bold</strong> or
+            *single asterisks* for <em>italic</em>.
+          </p>
           <AlignField
             value={block.align ?? "center"}
             onChange={(align) => onChange({ ...block, align })}
@@ -199,14 +223,29 @@ export default function BlockEditor({
             <textarea
               className={`${inputClass} min-h-32`}
               value={block.text}
-              placeholder="Leave a blank line between paragraphs."
+              placeholder="Leave a blank line between paragraphs. Use **bold** and *italic*."
               onChange={(e) => onChange({ ...block, text: e.target.value })}
             />
           </Field>
-          <AlignField
-            value={block.align ?? "left"}
-            onChange={(align) => onChange({ ...block, align })}
-          />
+          <div className="grid gap-3 sm:grid-cols-2">
+            <AlignField
+              value={block.align ?? "left"}
+              onChange={(align) => onChange({ ...block, align })}
+            />
+            <Field label="Text size">
+              <select
+                className={inputClass}
+                value={block.size ?? "base"}
+                onChange={(e) =>
+                  onChange({ ...block, size: e.target.value as TextSize })
+                }
+              >
+                <option value="sm">Small</option>
+                <option value="base">Normal</option>
+                <option value="lg">Large</option>
+              </select>
+            </Field>
+          </div>
         </div>
       );
 

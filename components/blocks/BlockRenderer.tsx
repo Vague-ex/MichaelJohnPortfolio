@@ -6,6 +6,7 @@ import type {
   ColumnsBlock,
   ContactBlock,
   ContactIcon,
+  HeadingSize,
   HeroBlock,
   ImageBlock,
   ImageRef,
@@ -13,6 +14,7 @@ import type {
   RichTextBlock,
   SiteSettings,
   TextAlign,
+  TextSize,
   TimelineBlock,
   VideoEmbedBlock,
 } from "@/lib/types";
@@ -27,6 +29,18 @@ const alignClass: Record<TextAlign, string> = {
   center: "text-center",
   right: "text-right",
   justify: "text-justify",
+};
+
+const headingSizeClass: Record<HeadingSize, string> = {
+  md: "text-4xl sm:text-5xl",
+  lg: "text-5xl sm:text-6xl",
+  xl: "text-5xl sm:text-6xl lg:text-7xl",
+};
+
+const textSizeClass: Record<TextSize, string> = {
+  sm: "text-sm",
+  base: "text-base",
+  lg: "text-lg",
 };
 
 const gridColsClass: Record<number, string> = {
@@ -77,13 +91,30 @@ function SmartImage({
   );
 }
 
+/** Renders inline **bold** and *italic* / _italic_ within a string. */
+function renderInline(text: string): React.ReactNode {
+  const nodes: React.ReactNode[] = [];
+  const regex = /(\*\*([^*]+)\*\*|\*([^*]+)\*|_([^_]+)_)/g;
+  let last = 0;
+  let key = 0;
+  let m: RegExpExecArray | null;
+  while ((m = regex.exec(text)) !== null) {
+    if (m.index > last) nodes.push(text.slice(last, m.index));
+    if (m[2] !== undefined) nodes.push(<strong key={key++}>{m[2]}</strong>);
+    else nodes.push(<em key={key++}>{m[3] ?? m[4]}</em>);
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) nodes.push(text.slice(last));
+  return nodes;
+}
+
 function Paragraphs({ text }: { text: string }) {
   const paragraphs = text.split(/\n{2,}/).filter((p) => p.trim().length > 0);
   return (
     <>
       {paragraphs.map((p, i) => (
         <p key={i} className="whitespace-pre-line leading-relaxed">
-          {p}
+          {renderInline(p)}
         </p>
       ))}
     </>
@@ -166,66 +197,73 @@ function CtaButtons({
 function Hero({ block }: { block: HeroBlock }) {
   const align = block.align ?? "center";
   const hasImage = !!block.image?.url;
+  const hSize = headingSizeClass[block.headingSize ?? "xl"];
 
   if (hasImage) {
     return (
       <section className="relative isolate overflow-hidden bg-neutral-950 text-white">
-        {/* Photo: on top for mobile, diagonal right panel on desktop. */}
-        <div className="relative h-72 w-full sm:h-96 md:absolute md:inset-y-0 md:right-0 md:h-full md:w-[52%]">
-          <div className="relative h-full w-full md:[clip-path:polygon(18%_0,100%_0,100%_100%,0%_100%)]">
-            <Image
-              src={block.image!.url}
-              alt={block.image!.alt ?? block.heading}
-              fill
-              priority
-              sizes="(max-width: 768px) 100vw, 55vw"
-              className="object-cover"
-            />
-            <div className="absolute inset-0 hidden bg-gradient-to-r from-neutral-950 via-neutral-950/20 to-transparent md:block" />
-          </div>
-        </div>
-
-        {/* Text */}
-        <div className="relative mx-auto flex max-w-6xl flex-col justify-center gap-6 px-6 py-14 md:min-h-[86vh] md:py-24 md:pr-[54%]">
-          {block.badgeText && (
-            <a
-              href={block.badgeUrl || undefined}
-              className="inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-sm text-white/80 transition hover:border-white/30"
+        <div className="mx-auto grid max-w-7xl items-stretch md:grid-cols-2">
+          {/* Text (solid left half so nothing wraps awkwardly) */}
+          <div className="flex flex-col justify-center gap-6 px-6 py-16 md:min-h-[86vh] md:py-24 md:pl-10 md:pr-8">
+            {block.badgeText && (
+              <a
+                href={block.badgeUrl || undefined}
+                className="inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-sm text-white/80 transition hover:border-white/30"
+              >
+                <span>{block.badgeText}</span>
+                {block.badgeUrl && (
+                  <span className="font-medium text-accent">Read more →</span>
+                )}
+              </a>
+            )}
+            {block.eyebrow && (
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">
+                {block.eyebrow}
+              </p>
+            )}
+            <h1
+              className={`${hSize} font-semibold leading-[1.05] tracking-tight`}
             >
-              <span>{block.badgeText}</span>
-              {block.badgeUrl && (
-                <span className="font-medium text-accent">Read more →</span>
+              {block.heading}
+            </h1>
+            {block.subheading && (
+              <p className="max-w-md text-lg text-white/70 sm:text-xl">
+                {renderInline(block.subheading)}
+              </p>
+            )}
+            <div className="flex flex-wrap gap-3 pt-2">
+              {block.ctaText && block.ctaUrl && (
+                <a
+                  href={block.ctaUrl}
+                  className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-white transition hover:bg-accent-dark"
+                >
+                  {block.ctaText}
+                </a>
               )}
-            </a>
-          )}
-          {block.eyebrow && (
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">
-              {block.eyebrow}
-            </p>
-          )}
-          <h1 className="text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
-            {block.heading}
-          </h1>
-          {block.subheading && (
-            <p className="max-w-xl text-lg text-white/70">{block.subheading}</p>
-          )}
-          <div className="flex flex-wrap gap-3 pt-2">
-            {block.ctaText && block.ctaUrl && (
-              <a
-                href={block.ctaUrl}
-                className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-white transition hover:bg-accent-dark"
-              >
-                {block.ctaText}
-              </a>
-            )}
-            {block.cta2Text && block.cta2Url && (
-              <a
-                href={block.cta2Url}
-                className="rounded-full border border-white/25 px-6 py-3 text-sm font-medium text-white transition hover:border-white/60"
-              >
-                {block.cta2Text}
-              </a>
-            )}
+              {block.cta2Text && block.cta2Url && (
+                <a
+                  href={block.cta2Url}
+                  className="rounded-full border border-white/25 px-6 py-3 text-sm font-medium text-white transition hover:border-white/60"
+                >
+                  {block.cta2Text}
+                </a>
+              )}
+            </div>
+          </div>
+
+          {/* Photo: below the text on mobile, diagonal right half on desktop */}
+          <div className="relative h-72 w-full sm:h-96 md:h-auto">
+            <div className="relative h-full w-full md:[clip-path:polygon(14%_0,100%_0,100%_100%,0%_100%)]">
+              <Image
+                src={block.image!.url}
+                alt={block.image!.alt ?? block.heading}
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 hidden bg-gradient-to-r from-neutral-950 via-transparent to-transparent md:block" />
+            </div>
           </div>
         </div>
       </section>
@@ -242,12 +280,14 @@ function Hero({ block }: { block: HeroBlock }) {
         } ${align === "center" ? "items-center" : ""}`}
       >
         {block.eyebrow && <Eyebrow>{block.eyebrow}</Eyebrow>}
-        <h1 className="text-5xl font-semibold leading-tight sm:text-6xl lg:text-7xl">
+        <h1 className={`${hSize} font-semibold leading-tight`}>
           {block.heading}
         </h1>
         <span className="block h-1 w-16 rounded-full bg-accent" />
         {block.subheading && (
-          <p className="max-w-2xl text-lg text-muted">{block.subheading}</p>
+          <p className="max-w-2xl text-lg text-muted">
+            {renderInline(block.subheading)}
+          </p>
         )}
         <CtaButtons
           primary={block.ctaText}
@@ -263,9 +303,10 @@ function Hero({ block }: { block: HeroBlock }) {
 
 function RichText({ block }: { block: RichTextBlock }) {
   const align = block.align ?? "left";
+  const size = textSizeClass[block.size ?? "base"];
   return (
     <section className="mx-auto max-w-4xl px-6 py-12 sm:py-16">
-      <div className={`space-y-4 ${alignClass[align]}`}>
+      <div className={`space-y-4 ${alignClass[align]} ${size}`}>
         {block.heading && <SectionHeading title={block.heading} align={align} />}
         {block.text && <Paragraphs text={block.text} />}
       </div>
